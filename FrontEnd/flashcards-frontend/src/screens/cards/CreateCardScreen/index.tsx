@@ -56,10 +56,10 @@ export const CreateCardScreen: React.FC = () => {
                     // FAZ UPLOAD REAL DA IMAGEM
                     const uploadResponse = await uploadAPI.uploadImage(result.assets[0].uri);
 
-                    // ⭐ CORREÇÃO: Construir URL completa da imagem
+                    // Construir URL completa da imagem
                     const fullImageUrl = `${API_BASE_URL}${uploadResponse.imageUrl}`;
 
-                    // ⭐ CORREÇÃO: Atualizar formData (não editCardData)
+                    // Atualizar formData (não editCardData)
                     setFormData({
                         ...formData,
                         questionImage: fullImageUrl

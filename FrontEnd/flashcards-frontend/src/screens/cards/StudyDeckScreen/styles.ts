@@ -480,12 +480,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     finishButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: '#007AFF',
         borderWidth: 1,
-        borderColor: '#DDD',
+        borderColor: '#007AFF',
     },
     finishButtonText: {
-        color: '#666',
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },

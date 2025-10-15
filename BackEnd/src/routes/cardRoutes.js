@@ -13,10 +13,10 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // Rotas de Cards
-router.post("/decks/:deckId/cards", createCard);
-router.get("/decks/:deckId/cards", getCards);
-router.put("/decks/:deckId/cards/:cardId", updateCard); // ← Inclui deckId
-router.delete("/decks/:deckId/cards/:cardId", deleteCard); // ← Inclui deckId
-router.delete("/decks/:deckId/cards", deleteAllCardsFromDeck);
+router.post("/:deckId/cards", createCard);
+router.get("/:deckId/cards", getCards);
+router.put("/:deckId/cards/:cardId", updateCard);
+router.delete("/:deckId/cards/:cardId", deleteCard);
+router.delete("/:deckId/cards", deleteAllCardsFromDeck);
 
 export default router;
