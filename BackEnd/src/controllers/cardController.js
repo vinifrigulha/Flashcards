@@ -1,4 +1,4 @@
-import prisma from "../prisma.js";
+import { cardModel } from "../models/cardModel.js";
 
 // Criar um novo card dentro de um deck
 export const createCard = async (req, res) => {
@@ -19,14 +19,14 @@ export const createCard = async (req, res) => {
       });
     }
 
-    const card = await prisma.card.create({
-      data: {
-        question: question?.trim() || null, // Pode ser null
-        questionImage: questionImage?.trim() || null,
-        answer: answer.trim(),
-        deckId: parseInt(deckId),
-      },
-    });
+    const cardData = {
+      question: question?.trim() || null,
+      questionImage: questionImage?.trim() || null,
+      answer: answer.trim(),
+      deckId: parseInt(deckId),
+    };
+
+    const card = await cardModel.createCard(cardData);
     res.json(card);
   } catch (err) {
     res.status(500).json({ error: "Erro ao criar card." });
@@ -35,38 +35,38 @@ export const createCard = async (req, res) => {
 
 // Atualizar um card
 export const updateCard = async (req, res) => {
-    const { deckId, cardId } = req.params; // ← Agora recebe deckId também
-    const { question, questionImage, answer } = req.body;
+  const { deckId, cardId } = req.params;
+  const { question, questionImage, answer } = req.body;
 
-    try {
-        // Validação: pelo menos texto OU imagem na pergunta
-        if (!question?.trim() && !questionImage?.trim()) {
-            return res.status(400).json({ 
-                error: "A pergunta deve conter texto ou imagem." 
-            });
-        }
-
-        if (!answer?.trim()) {
-            return res.status(400).json({ 
-                error: "A resposta é obrigatória." 
-            });
-        }
-
-        const card = await prisma.card.update({
-            where: { 
-                id: parseInt(cardId),
-                deckId: parseInt(deckId) // ← Garante que o card pertence ao deck
-            },
-            data: { 
-                question: question?.trim() || null,
-                questionImage: questionImage?.trim() || null,
-                answer: answer.trim()
-            },
-        });
-        res.json(card);
-    } catch (err) {
-        res.status(500).json({ error: "Erro ao atualizar card." });
+  try {
+    // Validação: pelo menos texto OU imagem na pergunta
+    if (!question?.trim() && !questionImage?.trim()) {
+      return res.status(400).json({ 
+        error: "A pergunta deve conter texto ou imagem." 
+      });
     }
+
+    if (!answer?.trim()) {
+      return res.status(400).json({ 
+        error: "A resposta é obrigatória." 
+      });
+    }
+
+    const updateData = { 
+      question: question?.trim() || null,
+      questionImage: questionImage?.trim() || null,
+      answer: answer.trim()
+    };
+
+    const card = await cardModel.updateCard(
+      parseInt(cardId), 
+      parseInt(deckId), 
+      updateData
+    );
+    res.json(card);
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao atualizar card." });
+  }
 };
 
 // Listar todos os cards de um deck
@@ -74,9 +74,7 @@ export const getCards = async (req, res) => {
   const { deckId } = req.params;
 
   try {
-    const cards = await prisma.card.findMany({
-      where: { deckId: parseInt(deckId) },
-    });
+    const cards = await cardModel.findCardsByDeck(parseInt(deckId));
     res.json(cards);
   } catch (err) {
     res.status(500).json({ error: "Erro ao buscar cards." });
@@ -85,15 +83,10 @@ export const getCards = async (req, res) => {
 
 // Deletar um card
 export const deleteCard = async (req, res) => {
-  const { deckId, cardId } = req.params; // ← Agora recebe deckId também
+  const { deckId, cardId } = req.params;
 
   try {
-    await prisma.card.delete({ 
-      where: { 
-        id: parseInt(cardId),
-        deckId: parseInt(deckId) // ← Garante que o card pertence ao deck
-      } 
-    });
+    await cardModel.deleteCard(parseInt(cardId), parseInt(deckId));
     res.json({ message: "Card deletado com sucesso!" });
   } catch (err) {
     res.status(500).json({ error: "Erro ao deletar card." });
@@ -105,9 +98,7 @@ export const deleteAllCardsFromDeck = async (req, res) => {
   const { deckId } = req.params;
 
   try {
-    await prisma.card.deleteMany({
-      where: { deckId: parseInt(deckId) },
-    });
+    await cardModel.deleteAllCardsFromDeck(parseInt(deckId));
     res.json({ message: "Todos os cards do deck foram deletados!" });
   } catch (err) {
     res.status(500).json({ error: "Erro ao deletar cards do deck." });

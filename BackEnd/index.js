@@ -30,7 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Rotas
 app.use("/api/auth", authRoutes);
 app.use("/api/decks", deckRoutes);
-app.use("/api/cards", cardRoutes);
+app.use("/api/decks", cardRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/deck-share", deckShareRoutes);
 

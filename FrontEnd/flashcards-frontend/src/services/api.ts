@@ -125,7 +125,7 @@ export const cardAPI = {
      * Busca todos os cards de um deck específico
      */
     getCards: async (deckId: number): Promise<Card[]> => {
-        const response = await api.get(`/api/cards/decks/${deckId}/cards`);
+        const response = await api.get(`/api/decks/${deckId}/cards`);
         return response.data;
     },
 
@@ -137,7 +137,7 @@ export const cardAPI = {
         questionImage?: string | null;
         answer: string;
     }): Promise<Card> => {
-        const response = await api.post(`/api/cards/decks/${deckId}/cards`, data);
+        const response = await api.post(`/api/decks/${deckId}/cards`, data);
         return response.data;
     },
 
@@ -149,7 +149,7 @@ export const cardAPI = {
         questionImage?: string | null;
         answer: string;
     }): Promise<Card> => {
-        const response = await api.put(`/api/cards/decks/${deckId}/cards/${cardId}`, data);
+        const response = await api.put(`/api/decks/${deckId}/cards/${cardId}`, data);
         return response.data;
     },
 
@@ -157,14 +157,14 @@ export const cardAPI = {
      * Deleta um card - CORREÇÃO AQUI
      */
     deleteCard: async (deckId: number, cardId: number): Promise<void> => {
-        await api.delete(`/api/cards/decks/${deckId}/cards/${cardId}`);
+        await api.delete(`/api/decks/${deckId}/cards/${cardId}`);
     },
 
     /**
      * Deleta todos os cards de um deck
      */
     deleteAllCardsFromDeck: async (deckId: number) => {
-        const response = await api.delete(`/api/cards/decks/${deckId}/cards`);
+        const response = await api.delete(`/api/decks/${deckId}/cards`);
         return response.data;
     },
 
