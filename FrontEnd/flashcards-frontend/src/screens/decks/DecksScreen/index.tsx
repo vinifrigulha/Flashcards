@@ -46,6 +46,7 @@ export const DecksScreen: React.FC = () => {
         }
     }, [searchQuery, decks]);
 
+    // Logout e confirmação
     const handleLogout = () => {
         setLogoutModalVisible(true);
     };
@@ -67,17 +68,17 @@ export const DecksScreen: React.FC = () => {
         setLogoutModalVisible(false);
     };
 
+    // Carregamento de decks
     const loadDecks = async () => {
         try {
             const decksData = await deckAPI.getDecks();
 
-            // ✅ CORREÇÃO: Filtrar decks excluídos localmente
+            // Filtrar decks excluídos localmente
             const filteredDecksData = decksData.filter(deck => !deletedDeckIds.has(deck.id));
 
             setDecks(filteredDecksData);
             setFilteredDecks(filteredDecksData);
         } catch (error: any) {
-            console.error('❌ Erro ao carregar decks:', error);
             Alert.alert('Erro', 'Não foi possível carregar os decks');
         } finally {
             setLoading(false);
@@ -85,13 +86,12 @@ export const DecksScreen: React.FC = () => {
         }
     };
 
-    // Sempre carrega na primeira vez
+    // Carrega decks quando a tela recebe foco
     useFocusEffect(
         React.useCallback(() => {
             loadDecks();
-
             setSearchQuery('');
-        }, []) // Remove hasLoaded da dependência
+        }, [])
     );
 
     const handleRefresh = () => {
@@ -103,6 +103,7 @@ export const DecksScreen: React.FC = () => {
         setSearchQuery('');
     };
 
+    // Navegação e ações
     const handleCreateDeck = () => {
         navigation.navigate('CreateDeck');
     };
@@ -120,37 +121,33 @@ export const DecksScreen: React.FC = () => {
         navigation.navigate('ShareDeck', { deck });
     };
 
+    // Exclusão de deck com tratamento de erro
     const confirmDeleteDeck = async () => {
         if (!selectedDeck) return;
 
         const deckIdToDelete = selectedDeck.id;
 
-        // ✅ FECHAR MODAL PRIMEIRO
+        // Fechar modal primeiro
         setDeleteDeckModalVisible(false);
         setSelectedDeck(null);
 
         try {
-            // ✅ TENTAR EXCLUIR NO SERVIDOR PRIMEIRO
+            // Tentar excluir no servidor primeiro
             await deckAPI.deleteDeck(deckIdToDelete);
 
-            // ✅ DEPOIS REMOVER LOCALMENTE
+            // Remover localmente após sucesso no servidor
             setDecks(prev => prev.filter(deck => deck.id !== deckIdToDelete));
             setFilteredDecks(prev => prev.filter(deck => deck.id !== deckIdToDelete));
             setDeletedDeckIds(prev => new Set(prev).add(deckIdToDelete));
 
         } catch (error: any) {
-            console.error('❌ Erro ao excluir deck:', error);
-
-            // ❌ SE FALHAR, MOSTRAR ALERTA E RECARREGAR
             Alert.alert(
                 'Erro na exclusão',
-                'Não foi possível excluir o deck no servidor. ' +
-                'Recarregando a lista...',
+                'Não foi possível excluir o deck no servidor. Recarregando a lista...',
                 [
                     {
                         text: 'OK',
                         onPress: () => {
-                            // Forçar recarga completa
                             setLoading(true);
                             loadDecks();
                         }
@@ -164,6 +161,7 @@ export const DecksScreen: React.FC = () => {
         navigation.navigate('DeckCards', { deck });
     };
 
+    // Utilitários para informações do deck
     const getCardCount = (deck: Deck) => {
         return deck.cards?.length || 0;
     };
@@ -172,6 +170,7 @@ export const DecksScreen: React.FC = () => {
         return deck.title.startsWith('Cópia - ');
     };
 
+    // Mensagem de confirmação de exclusão com informações contextuais
     const getDeleteDeckMessage = () => {
         if (!selectedDeck) return null;
 
@@ -206,6 +205,7 @@ export const DecksScreen: React.FC = () => {
         }
     };
 
+    // Renderização do item do deck
     const renderDeckItem = ({ item }: { item: Deck }) => {
         const cardCount = getCardCount(item);
         const isShared = isSharedDeck(item);
@@ -332,7 +332,7 @@ export const DecksScreen: React.FC = () => {
                 </View>
             </Modal>
 
-            {/* Header */}
+            {/* Header com informações do usuário */}
             <View style={styles.header}>
                 <View style={styles.headerInfo}>
                     <View style={styles.titleRow}>
@@ -353,7 +353,7 @@ export const DecksScreen: React.FC = () => {
                 </View>
             </View>
 
-            {/* Barra de Busca e Botão de Importar */}
+            {/* Barra de busca e botão de importar */}
             <View style={styles.searchSection}>
                 <View style={styles.searchContainer}>
                     <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
@@ -380,7 +380,7 @@ export const DecksScreen: React.FC = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Lista de Decks ou Estado Vazio */}
+            {/* Lista de decks ou estado vazio */}
             {filteredDecks.length === 0 ? (
                 <View style={styles.emptyContainer}>
                     <Icon name="folder-off" size={64} color="#CCC" />
@@ -413,7 +413,7 @@ export const DecksScreen: React.FC = () => {
                 />
             )}
 
-            {/* FAB para criar novo deck */}
+            {/* Botão flutuante para criar novo deck */}
             {filteredDecks.length > 0 && (
                 <TouchableOpacity style={styles.fab} onPress={handleCreateDeck}>
                     <Icon name="add" size={24} color="#FFF" />

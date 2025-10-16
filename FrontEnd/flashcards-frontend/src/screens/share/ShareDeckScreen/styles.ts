@@ -1,7 +1,7 @@
-// src/screens/share/ShareDeckScreen/styles.ts
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
+    // Layout Principal
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',
@@ -17,6 +17,8 @@ export default StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
+
+    // Header
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -38,6 +40,8 @@ export default StyleSheet.create({
     headerPlaceholder: {
         width: 32,
     },
+
+    // Informações do Deck
     deckInfo: {
         backgroundColor: '#FFF',
         padding: 16,
@@ -65,6 +69,8 @@ export default StyleSheet.create({
         color: '#007AFF',
         fontWeight: '500',
     },
+
+    // Botões e Ações
     generateButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -87,6 +93,11 @@ export default StyleSheet.create({
         textAlign: 'center',
         flex: 1,
     },
+    buttonDisabled: {
+        opacity: 0.6,
+    },
+
+    // Lista de Códigos
     codesList: {
         flex: 1,
         padding: 16,
@@ -131,6 +142,8 @@ export default StyleSheet.create({
     actionButton: {
         padding: 8,
     },
+
+    // Estado Vazio
     emptyContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -149,11 +162,8 @@ export default StyleSheet.create({
         textAlign: 'center',
         lineHeight: 20,
     },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
 
-    // Modal Styles
+    // Modal do QR Code
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -181,16 +191,32 @@ export default StyleSheet.create({
         marginVertical: 20,
         minHeight: 280,
     },
-    messageContainer: {
-        height: 40,
-        justifyContent: 'center',
-        marginTop: 12,
-    },
     shareCodeText: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#007AFF',
         marginTop: 16,
+    },
+    messageContainer: {
+        height: 40,
+        justifyContent: 'center',
+        marginTop: 12,
+    },
+    copiedMessage: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#E8F5E8',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#4CAF50',
+    },
+    copiedMessageText: {
+        color: '#2E7D32',
+        fontSize: 14,
+        fontWeight: '500',
+        marginLeft: 6,
     },
     modalButtons: {
         flexDirection: 'row',
@@ -226,24 +252,8 @@ export default StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
-    copiedMessage: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#E8F5E8',
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: '#4CAF50',
-    },
-    copiedMessageText: {
-        color: '#2E7D32',
-        fontSize: 14,
-        fontWeight: '500',
-        marginLeft: 6,
-    },
 
-    // UseShareCodeScreen Styles (se estiver no mesmo arquivo)
+    // Tela de Usar Código
     inputSection: {
         backgroundColor: '#FFF',
         padding: 16,

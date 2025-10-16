@@ -1,11 +1,14 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+    // Layout principal
     container: {
         flexGrow: 1,
         padding: 20,
         backgroundColor: '#F5F5F5',
     },
+
+    // Cabeçalho e textos
     title: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -21,6 +24,8 @@ const styles = StyleSheet.create({
         color: '#666',
         lineHeight: 22,
     },
+
+    // Formulário
     form: {
         marginBottom: 30,
     },
@@ -52,6 +57,8 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         marginTop: 4,
     },
+
+    // Botões
     buttonContainer: {
         flexDirection: 'row',
         gap: 12,

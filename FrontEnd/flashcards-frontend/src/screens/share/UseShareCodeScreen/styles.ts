@@ -4,11 +4,14 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
+    // Layout Principal
     container: {
         flexGrow: 1,
         backgroundColor: '#F5F5F5',
         padding: 16,
     },
+
+    // Header
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -27,14 +30,18 @@ export default StyleSheet.create({
     headerPlaceholder: {
         width: 32,
     },
+
+    // Seção de Entrada do Código
     inputSection: {
         backgroundColor: '#FFF',
         padding: 16,
         borderRadius: 12,
         marginBottom: 16,
-        // CORREÇÃO: Substituir shadow por boxShadow/elevation
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
         elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     sectionTitle: {
         fontSize: 16,
@@ -74,7 +81,7 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Scanner Styles
+    // Scanner de QR Code
     scannerContainer: {
         flex: 1,
         backgroundColor: '#000',
@@ -174,15 +181,17 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
 
-    // Preview Section Styles
+    // Seção de Pré-visualização
     previewSection: {
         backgroundColor: '#FFF',
         padding: 16,
         borderRadius: 12,
         marginBottom: 16,
-        // CORREÇÃO: Substituir shadow por boxShadow/elevation
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
         elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     previewCard: {
         backgroundColor: '#F8F9FA',
@@ -216,6 +225,8 @@ export default StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+
+    // Mensagens de Status
     errorText: {
         color: '#FF3B30',
         fontSize: 14,
@@ -228,6 +239,8 @@ export default StyleSheet.create({
         fontWeight: '500',
         marginTop: 8,
     },
+
+    // Botões de Ação
     actionButtons: {
         flexDirection: 'row',
         gap: 12,
@@ -270,12 +283,17 @@ export default StyleSheet.create({
     buttonDisabled: {
         opacity: 0.6,
     },
+
+    // Instruções
     instructions: {
         backgroundColor: '#FFF',
         padding: 16,
         borderRadius: 12,
-        boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
         elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     instructionsTitle: {
         fontSize: 16,

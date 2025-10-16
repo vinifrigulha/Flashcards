@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+    // Layout principal
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',
@@ -11,6 +12,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F5F5F5',
     },
+
+    // Header e progresso
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -58,6 +61,8 @@ const styles = StyleSheet.create({
         color: '#666',
         fontWeight: '600',
     },
+
+    // Informações do deck
     deckInfo: {
         padding: 20,
         alignItems: 'center',
@@ -74,6 +79,8 @@ const styles = StyleSheet.create({
         color: '#666',
         textAlign: 'center',
     },
+
+    // Card de estudo
     cardContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -119,6 +126,8 @@ const styles = StyleSheet.create({
         lineHeight: 26,
         fontWeight: '500',
     },
+
+    // Área de exercícios
     exerciseContainer: {
         padding: 20,
         paddingBottom: 40,
@@ -132,7 +141,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    // Multiple Choice
+    // Múltipla escolha
     multipleChoiceContainer: {
         gap: 12,
     },
@@ -204,7 +213,7 @@ const styles = StyleSheet.create({
         lineHeight: 18,
     },
 
-    // Typing
+    // Modo de digitação
     typingContainer: {
         gap: 16,
     },
@@ -249,7 +258,7 @@ const styles = StyleSheet.create({
         color: '#FF3B30',
     },
 
-    // Flashcard
+    // Flashcards
     flashcardContainer: {
         gap: 16,
     },
@@ -296,7 +305,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
 
-    // Exercise Type Indicator
+    // Indicador de tipo de exercício
     exerciseTypeIndicator: {
         width: 40,
         alignItems: 'center',
@@ -315,7 +324,7 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
     },
 
-    // Modal de Confirmação de Saída
+    // Modais
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -380,7 +389,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
 
-    // Tela de Resultados
+    // Tela de resultados
     resultContainer: {
         flex: 1,
         backgroundColor: '#F5F5F5',
@@ -501,7 +510,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
 
-    // Modal de Seleção de Modo
+    // Seleção de modo de estudo
     modeSelectionContainer: {
         flex: 1,
         backgroundColor: '#F5F5F5',

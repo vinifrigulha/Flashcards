@@ -30,12 +30,15 @@ type ExerciseType = 'flashcard' | 'multipleChoice' | 'typing';
 type StudyMode = 'flashcard' | 'multipleChoice' | 'typing' | 'random';
 
 export const StudyDeckScreen: React.FC = () => {
+    // Estados do estudo
     const [currentCardIndex, setCurrentCardIndex] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [correctAnswers, setCorrectAnswers] = useState<number[]>([]);
     const [wrongAnswers, setWrongAnswers] = useState<number[]>([]);
     const [studyCompleted, setStudyCompleted] = useState(false);
     const [exitModalVisible, setExitModalVisible] = useState(false);
+
+    // Estados do modo de estudo
     const [modeSelectionVisible, setModeSelectionVisible] = useState(true);
     const [selectedMode, setSelectedMode] = useState<StudyMode>('random');
     const [userAnswer, setUserAnswer] = useState('');
@@ -51,6 +54,7 @@ export const StudyDeckScreen: React.FC = () => {
 
     const progress = ((currentCardIndex + 1) / studyCards.length) * 100;
 
+    // Seleção do modo de estudo
     const handleModeSelection = (mode: StudyMode) => {
         setSelectedMode(mode);
         setModeSelectionVisible(false);
@@ -74,13 +78,12 @@ export const StudyDeckScreen: React.FC = () => {
         }
     };
 
+    // Verifica se o modo múltipla escolha pode ser usado
     const canUseMultipleChoice = () => {
         if (deck.cards.length < 4) {
-            console.log('❌ Múltipla escolha: Menos de 4 cards');
             return false;
         }
 
-        // Filtrar cards válidos e contar respostas únicas
         const validCards = deck.cards.filter(card =>
             card.answer &&
             card.answer.trim() !== '' &&
@@ -88,17 +91,10 @@ export const StudyDeckScreen: React.FC = () => {
         );
 
         const uniqueAnswers = [...new Set(validCards.map(card => card.answer.trim()))];
-
-        console.log('🔍 Verificação múltipla escolha:', {
-            totalCards: deck.cards.length,
-            validCards: validCards.length,
-            uniqueAnswers: uniqueAnswers.length,
-            uniqueAnswersList: uniqueAnswers
-        });
-
         return uniqueAnswers.length >= 4;
     };
 
+    // Efeito para gerar exercícios quando o card muda
     useEffect(() => {
         if (cards.length === 0) {
             Alert.alert('Aviso', 'Não há cards para estudar neste deck');
@@ -118,18 +114,16 @@ export const StudyDeckScreen: React.FC = () => {
         }
     }, [currentCardIndex, studyCards, selectedMode, modeSelectionVisible]);
 
+    // Efeito para atualizar o card atual e gerar opções
     useEffect(() => {
         if (studyCards.length > 0 && currentCardIndex < studyCards.length) {
             const newCard = studyCards[currentCardIndex];
             setCurrentCard(newCard);
 
-            // GERAR OPÇÕES IMEDIATAMENTE quando o card mudar
             if (!modeSelectionVisible && newCard) {
                 if (selectedMode === 'multipleChoice' && canUseMultipleChoice()) {
-                    console.log('🔄 Gerando opções para novo card:', newCard.question);
                     generateMultipleChoiceOptions(newCard);
                 } else if (selectedMode === 'random' && currentExerciseType === 'multipleChoice') {
-                    console.log('🔄 Gerando opções em modo aleatório:', newCard.question);
                     generateMultipleChoiceOptions(newCard);
                 }
             }
@@ -138,7 +132,7 @@ export const StudyDeckScreen: React.FC = () => {
         }
     }, [studyCards, currentCardIndex, modeSelectionVisible, selectedMode]);
 
-    // Inicializar studyCards
+    // Inicializar cards de estudo embaralhados
     useEffect(() => {
         if (cards.length > 0 && studyCards.length === 0) {
             const shuffledCards = [...cards].sort(() => Math.random() - 0.5);
@@ -146,6 +140,7 @@ export const StudyDeckScreen: React.FC = () => {
         }
     }, [cards]);
 
+    // Gera tipo de exercício aleatório balanceado
     const generateRandomExercise = () => {
         if (!currentCard) return;
 
@@ -164,6 +159,7 @@ export const StudyDeckScreen: React.FC = () => {
             return;
         }
 
+        // Conta tipos usados para balancear
         const usedTypes = studyCards.slice(0, currentCardIndex).map((card, index) => {
             return availableTypes[index % availableTypes.length];
         });
@@ -178,6 +174,7 @@ export const StudyDeckScreen: React.FC = () => {
             typeCount[type]++;
         });
 
+        // Seleciona o tipo menos usado para balanceamento
         let leastUsedType: ExerciseType = availableTypes[0];
         let minCount = typeCount[leastUsedType];
 
@@ -199,64 +196,47 @@ export const StudyDeckScreen: React.FC = () => {
         }
     };
 
+    // Gera opções para múltipla escolha
     const generateMultipleChoiceOptions = (card?: Card) => {
         const targetCard = card || currentCard;
         if (!targetCard) return;
 
         const correctAnswer = targetCard.answer;
 
-        console.log('🔍 Gerando opções PARA O CARD ATUAL:', {
-            pergunta: targetCard.question,
-            respostaCorreta: correctAnswer,
-            cardId: targetCard.id
-        });
-
-        // Buscar TODOS os cards do deck (exceto o atual)
+        // Buscar cards para respostas erradas
         const otherCards = deck.cards.filter(card =>
             card.id !== targetCard.id &&
             card.answer &&
             card.answer.trim() !== ''
         );
 
-        console.log('📋 Cards disponíveis para respostas erradas:', otherCards.length);
-
-        // Buscar respostas erradas únicas dos outros cards
+        // Buscar respostas erradas únicas
         const wrongAnswers = [...new Set(
             otherCards.map(card => card.answer)
         )].sort(() => Math.random() - 0.5);
 
-        console.log('❌ Respostas erradas disponíveis:', wrongAnswers);
-
-        // VERIFICAÇÃO CRÍTICA: Se não temos respostas erradas suficientes
+        // Fallback se não há respostas erradas suficientes
         if (wrongAnswers.length < 3) {
-            console.warn('⚠️ Fallback: Apenas', wrongAnswers.length, 'respostas erradas disponíveis');
-
             const allOptions = [correctAnswer];
-
-            // Usar respostas erradas disponíveis
             wrongAnswers.forEach(wrong => {
                 if (allOptions.length < 4 && wrong !== correctAnswer) {
                     allOptions.push(wrong);
                 }
             });
 
-            // Se ainda não tivermos 4 opções, completar com placeholders
             while (allOptions.length < 4) {
                 allOptions.push(`Opção ${allOptions.length + 1}`);
             }
 
-            console.log('🔄 Fallback - Opções:', allOptions);
             setOptions(allOptions.sort(() => Math.random() - 0.5));
             return;
         }
 
-        // CASO NORMAL: Temos respostas erradas suficientes
+        // Caso normal: 1 correta + 3 erradas
         const selectedWrongAnswers = wrongAnswers.slice(0, 3);
-
-        // ⚠️ IMPORTANTE: Garantir que nenhuma resposta errada seja igual à correta
         const filteredWrongAnswers = selectedWrongAnswers.filter(answer => answer !== correctAnswer);
 
-        // Se filtramos alguma resposta, completar com outras
+        // Completar com outras respostas se necessário
         while (filteredWrongAnswers.length < 3 && wrongAnswers.length > filteredWrongAnswers.length) {
             const extraAnswer = wrongAnswers.find(w =>
                 w !== correctAnswer && !filteredWrongAnswers.includes(w)
@@ -268,47 +248,26 @@ export const StudyDeckScreen: React.FC = () => {
             }
         }
 
-        // Criar opções: 1 correta + 3 erradas
         let allOptions = [correctAnswer, ...filteredWrongAnswers.slice(0, 3)];
 
-        console.log('📝 Opções antes do shuffle:', allOptions);
-
-        // VALIDAÇÃO FINAL: Garantir que a resposta correta está presente
+        // Validações de segurança
         const hasCorrectAnswer = allOptions.includes(correctAnswer);
         if (!hasCorrectAnswer) {
-            console.error('🚨 ERRO CRÍTICO: Resposta correta não está nas opções! Corrigindo...');
-            // Substituir a primeira opção pela resposta correta
             allOptions[0] = correctAnswer;
         }
 
-        // Verificar se temos exatamente 4 opções
-        if (allOptions.length !== 4) {
-            console.warn('⚠️ Aviso: Número de opções diferente de 4:', allOptions.length);
-        }
-
-        // Embaralhar as opções
-        allOptions = allOptions.sort(() => Math.random() - 0.5);
-
-        // VALIDAÇÃO EXTREMA
+        // Validação final do número de respostas corretas
         const finalCorrectCount = allOptions.filter(option => option === correctAnswer).length;
         if (finalCorrectCount !== 1) {
-            console.error('🚨 ERRO GRAVE: Número incorreto de respostas corretas:', finalCorrectCount);
-            // Forçar correção: criar array com 1 correta + 3 primeiras erradas disponíveis
             const forcedOptions = [correctAnswer, ...wrongAnswers.slice(0, 3)];
             setOptions(forcedOptions.sort(() => Math.random() - 0.5));
             return;
         }
 
-        console.log('✅ Opções finais geradas com SUCESSO:', {
-            opções: allOptions,
-            respostaCorreta: correctAnswer,
-            respostaCorretaPresente: allOptions.includes(correctAnswer),
-            quantidadeRespostasCorretas: finalCorrectCount
-        });
-
-        setOptions(allOptions);
+        setOptions(allOptions.sort(() => Math.random() - 0.5));
     };
 
+    // Handlers de respostas
     const handleShowAnswer = () => {
         setShowAnswer(true);
     };
@@ -376,6 +335,7 @@ export const StudyDeckScreen: React.FC = () => {
         }
     };
 
+    // Navegação e modais
     const handleExit = () => {
         setExitModalVisible(true);
     };
@@ -395,6 +355,7 @@ export const StudyDeckScreen: React.FC = () => {
         setExitModalVisible(false);
     };
 
+    // Cálculo dos resultados
     const getStudyResult = (): StudyResult => {
         const total = studyCards.length;
         const correct = correctAnswers.length;
@@ -409,6 +370,7 @@ export const StudyDeckScreen: React.FC = () => {
         };
     };
 
+    // Renderização dos tipos de exercício
     const renderExerciseType = () => {
         switch (currentExerciseType) {
             case 'multipleChoice':
@@ -568,6 +530,7 @@ export const StudyDeckScreen: React.FC = () => {
         return iconMap[mode] || require('../../../../assets/icons/dices.png');
     };
 
+    // Tela de resultados
     if (studyCompleted) {
         const result = getStudyResult();
 
@@ -646,7 +609,7 @@ export const StudyDeckScreen: React.FC = () => {
         );
     }
 
-    // Modal de Seleção de Modo de Estudo
+    // Modal de seleção de modo de estudo
     if (modeSelectionVisible) {
         return (
             <View style={styles.modeSelectionContainer}>
@@ -727,6 +690,7 @@ export const StudyDeckScreen: React.FC = () => {
         );
     }
 
+    // Tela principal de estudo
     return (
         <View style={styles.container}>
             {/* Modal de Confirmação de Saída */}
