@@ -1,6 +1,7 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Deck, Card } from './index';
 
+// Define todas as rotas disponíveis na aplicação e seus parâmetros
 export type RootStackParamList = {
     Login: undefined;
     Register: undefined;
@@ -19,7 +20,7 @@ export type RootStackParamList = {
     UseShareCode: undefined;
 };
 
-// Tipos para cada screen
+// Tipos de props de navegação para cada tela (TypeScript)
 export type LoginScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
 export type RegisterScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Register'>;
 export type DecksScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Decks'>;

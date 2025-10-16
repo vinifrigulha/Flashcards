@@ -1,57 +1,63 @@
+// Configuração do Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
+// Configuração do banco de dados PostgreSQL
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+// Entidade principal do sistema - usuários da aplicação
 model User {
   id        Int       @id @default(autoincrement())
   name      String
   email     String    @unique
   password  String
-  decks     Deck[]
-  deckShares DeckShare[]
+  decks     Deck[]                    // Decks criados pelo usuário
+  deckShares DeckShare[]              // Códigos de compartilhamento gerados
   createdAt DateTime  @default(now())
 }
 
+// Conjuntos de cards de estudo - organizados por usuário
 model Deck {
   id          Int       @id @default(autoincrement())
   title       String
   description String?
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])  // Dono do deck
   userId      Int
-  cards       Card[]
-  shares      DeckShare[]
-  isPublic    Boolean   @default(false)
+  cards       Card[]                   // Cards pertencentes a este deck
+  shares      DeckShare[]              // Códigos de compartilhamento ativos
+  isPublic    Boolean   @default(false) // Controle de visibilidade pública
   createdAt   DateTime  @default(now())
 }
 
+// Cartões de estudo individuais - perguntas e respostas
 model Card {
   id        Int      @id @default(autoincrement())
-  question  String?
-  questionImage String? @db.Text
-  answer    String
-  deck      Deck     @relation(fields: [deckId], references: [id])
+  question  String?                   // Texto da pergunta (opcional se tiver imagem)
+  questionImage String? @db.Text      // URL da imagem da pergunta
+  answer    String                    // Resposta obrigatória
+  deck      Deck     @relation(fields: [deckId], references: [id])  // Deck pai
   deckId    Int
   createdAt DateTime @default(now())
 }
 
+// Sistema de compartilhamento de decks com códigos únicos
 model DeckShare {
   id          Int      @id @default(autoincrement())
   deck        Deck     @relation(fields: [deckId], references: [id], onDelete: Cascade)
   deckId      Int
-  shareCode   String   @unique
-  createdBy   User     @relation(fields: [createdById], references: [id])
+  shareCode   String   @unique        // Código único para compartilhar
+  createdBy   User     @relation(fields: [createdById], references: [id])  // Criador do código
   createdById Int
-  expiresAt   DateTime?
-  maxUses     Int?
-  useCount    Int      @default(0)
-  isActive    Boolean  @default(true)
+  expiresAt   DateTime?               // Data de expiração opcional
+  maxUses     Int?                    // Limite máximo de usos
+  useCount    Int      @default(0)    // Contador de usos realizados
+  isActive    Boolean  @default(true) // Controle de revogação
   createdAt   DateTime @default(now())
   
-  @@index([shareCode])
-  @@map("deck_shares")
+  @@index([shareCode])                // Índice para buscas por código
+  @@map("deck_shares")                // Nome da tabela no banco
 }

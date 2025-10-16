@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User, LoginData, RegisterData, AuthResponse } from '../types';
 import { authAPI } from '../services/api';
 
+// Define a estrutura dos dados que estarão disponíveis no contexto
 interface AuthContextData {
     user: User | null;
     loading: boolean;
@@ -12,8 +13,10 @@ interface AuthContextData {
     isAuthenticated: boolean;
 }
 
+// Cria o contexto de autenticação com valores padrão
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
+// Hook personalizado para acessar o contexto de forma simplificada
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {
@@ -26,17 +29,21 @@ interface AuthProviderProps {
     children: ReactNode;
 }
 
+// Provedor principal que gerencia o estado global de autenticação
+// Controla login, logout, registro e persistência de sessão
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+    // Inicializa o estado de autenticação ao carregar o app
     useEffect(() => {
         setLoading(false);
         setIsAuthenticated(false);
         setUser(null);
     }, []);
 
+    // Processa o login do usuário e armazena tokens localmente
     const login = async (data: LoginData): Promise<void> => {
         setLoading(true);
         try {
@@ -47,6 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 throw new Error('Resposta da API inválida');
             }
 
+            // Persiste token e dados do usuário no armazenamento local
             await AsyncStorage.setItem('userToken', token);
             await AsyncStorage.setItem('user', JSON.stringify(userData));
 
@@ -54,13 +62,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setIsAuthenticated(true);
         } catch (error: any) {
             const errorMessage = error.response?.data?.error || error.message || 'Erro ao fazer login';
-            console.error('❌ Erro no login:', errorMessage);
             throw new Error(errorMessage);
         } finally {
             setLoading(false);
         }
     };
 
+    // Registra novo usuário no sistema
     const register = async (data: RegisterData): Promise<void> => {
         try {
             await authAPI.register(data);
@@ -69,22 +77,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     };
 
+    // Remove credenciais e finaliza sessão do usuário
     const logout = async (): Promise<void> => {
         try {
-            // Limpar AsyncStorage
+            // Limpa todos os dados de autenticação do armazenamento
             await AsyncStorage.multiRemove(['userToken', 'user']);
-
-            // Atualizar estado APENAS
             setUser(null);
             setIsAuthenticated(false);
-
-            // A navegação deve ser feita apenas nos componentes
         } catch (error) {
-            console.error('❌ Erro ao fazer logout:', error);
             throw error;
         }
     };
 
+    // Valor do contexto disponível para todos os componentes filhos
     const value: AuthContextData = {
         user,
         loading,

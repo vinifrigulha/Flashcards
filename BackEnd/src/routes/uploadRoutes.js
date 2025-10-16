@@ -6,18 +6,18 @@ import { authenticateToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// Configuração do multer para salvar imagens PERMANENTEMENTE
+// Configuração para armazenamento permanente
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads/';
-    // Garante que o diretório existe
+    // Cria diretório se não existir
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Gera um nome único para o arquivo
+    // Nome único baseado em timestamp
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, 'card-image-' + uniqueSuffix + path.extname(file.originalname));
   }
@@ -26,6 +26,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
+    // Valida tipo de arquivo
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
@@ -33,18 +34,18 @@ const upload = multer({
     }
   },
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 5 * 1024 * 1024 // 5MB máximo
   }
 });
 
-// Rota para upload de imagem
+// Rota para upload de imagens com autenticação
 router.post("/", authenticateToken, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'Nenhuma imagem enviada' });
     }
 
-    // Retorna a URL da imagem (agora salva permanentemente)
+    // Retorna URL para acesso à imagem
     const imageUrl = `/uploads/${req.file.filename}`;
     
     res.json({

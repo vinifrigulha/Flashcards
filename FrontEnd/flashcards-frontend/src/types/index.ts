@@ -1,3 +1,4 @@
+// Interface para usuário do sistema
 export interface User {
     id: number;
     name: string;
@@ -5,6 +6,7 @@ export interface User {
     createdAt: string;
 }
 
+// Interface para decks de estudo
 export interface Deck {
     id: number;
     title: string;
@@ -15,6 +17,7 @@ export interface Deck {
     createdAt: string;
 }
 
+// Interface para cards individuais (perguntas e respostas)
 export interface Card {
     id: number;
     question?: string | null;
@@ -24,6 +27,7 @@ export interface Card {
     createdAt: string;
 }
 
+// Interface para códigos de compartilhamento de decks
 export interface DeckShare {
     id: number;
     shareCode: string;
@@ -40,6 +44,7 @@ export interface DeckShare {
     createdAt: string;
 }
 
+// Interface para preview de deck antes da cópia
 export interface DeckPreview {
     id: number;
     title: string;
@@ -52,17 +57,20 @@ export interface DeckPreview {
     isPublic: boolean;
 }
 
+// Interface para respostas de autenticação
 export interface AuthResponse {
     token?: string;
     user: User;
     message?: string;
 }
 
+// Dados necessários para login
 export interface LoginData {
     email: string;
     password: string;
 }
 
+// Dados necessários para registro de novo usuário
 export interface RegisterData {
     name: string;
     email: string;
@@ -70,11 +78,12 @@ export interface RegisterData {
     confirmPassword?: string;
 }
 
+// Interface padronizada para erros da API
 export interface ApiError {
     error: string;
     details?: string;
     statusCode?: number;
 }
 
-// Re-export dos tipos de navegação
+// Re-export dos tipos de navegação para facilitar imports
 export * from './navigation';

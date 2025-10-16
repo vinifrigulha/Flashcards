@@ -26,6 +26,8 @@ type RouteParams = {
     onDeckUpdated?: (updatedDeck: Deck) => void;
 };
 
+// Tela principal para gerenciar cards dentro de um deck específico
+// Permite visualizar, editar, excluir cards e configurar sessões de estudo
 export const DeckCardsScreen: React.FC = () => {
     const [cards, setCards] = useState<Card[]>([]);
     const [filteredCards, setFilteredCards] = useState<Card[]>([]);
@@ -53,21 +55,19 @@ export const DeckCardsScreen: React.FC = () => {
     const route = useRoute();
     const { deck, onDeckUpdated } = route.params as RouteParams;
 
-    // Verificar se é um deck compartilhado (cópia)
+    // Identifica se é um deck compartilhado (cópia de outro usuário)
     const isSharedDeck = currentDeck ? currentDeck.title.startsWith('Cópia - ') : false;
 
-    // Inicializa o currentDeck imediatamente
+    // Inicializa o deck atual e carrega os cards
     useEffect(() => {
         setCurrentDeck(deck);
         navigation.setOptions({
             title: deck.title
         });
-
-        // Carrega os cards imediatamente
         loadCards(deck.id);
     }, [deck, navigation]);
 
-    // Filtra cards baseado na busca
+    // Filtra cards baseado no termo de busca
     useEffect(() => {
         if (searchQuery.trim() === '') {
             setFilteredCards(cards);
@@ -81,11 +81,10 @@ export const DeckCardsScreen: React.FC = () => {
         }
     }, [searchQuery, cards]);
 
-    // Função loadCards recebe deckId como parâmetro
+    // Carrega os cards do deck específico
     const loadCards = async (deckId: number) => {
         try {
             const cardsData = await cardAPI.getCards(deckId);
-
             setCards(cardsData);
             setFilteredCards(cardsData);
         } catch (error: any) {
@@ -96,7 +95,7 @@ export const DeckCardsScreen: React.FC = () => {
         }
     };
 
-    // useFocusEffect simplificado
+    // Recarrega os cards quando a tela recebe foco
     useFocusEffect(
         React.useCallback(() => {
             if (currentDeck) {
@@ -116,21 +115,21 @@ export const DeckCardsScreen: React.FC = () => {
         setSearchQuery('');
     };
 
-    // Compartilhar deck
+    // Navega para tela de compartilhamento do deck
     const handleShareDeck = () => {
         if (!currentDeck) return;
         navigation.navigate('ShareDeck', { deck: currentDeck });
     };
 
-    // Removido bloqueio para decks compartilhados
+    // Prepara card para exclusão (abre modal de confirmação)
     const handleDeleteCard = (cardId: number) => {
         const card = cards.find(c => c.id === cardId);
         if (!card) return;
-
         setSelectedCard(card);
         setDeleteCardModalVisible(true);
     };
 
+    // Confirma e executa a exclusão do card
     const confirmDeleteCard = async () => {
         if (!selectedCard || !currentDeck) return;
 
@@ -146,11 +145,13 @@ export const DeckCardsScreen: React.FC = () => {
         }
     };
 
+    // Navega para tela de criação de novo card
     const handleCreateCard = () => {
         if (!currentDeck) return;
         navigation.navigate('CreateCard', { deckId: currentDeck.id });
     };
 
+    // Abre modal para configurar sessão de estudo
     const handleStudyDeck = () => {
         if (cards.length === 0) {
             Alert.alert('Aviso', 'Adicione cards ao deck antes de estudar');
@@ -159,11 +160,13 @@ export const DeckCardsScreen: React.FC = () => {
         setStudyModalVisible(true);
     };
 
+    // Inicia sessão de estudo com quantidade específica de cards
     const startStudySession = () => {
         if (!currentDeck) return;
 
         let cardsToStudy = cards.length;
 
+        // Valida quantidade personalizada de cards
         if (studyCardCount && studyCardCount !== '') {
             const requestedCount = parseInt(studyCardCount);
             if (requestedCount > 0 && requestedCount <= cards.length) {
@@ -174,23 +177,25 @@ export const DeckCardsScreen: React.FC = () => {
             }
         }
 
+        // Embaralha cards e seleciona quantidade desejada
         const shuffledCards = [...cards]
             .sort(() => Math.random() - 0.5)
             .slice(0, cardsToStudy);
 
         setStudyModalVisible(false);
 
+        // Navega para tela de estudo com cards selecionados
         navigation.navigate('StudyDeck', {
             deck: { ...currentDeck, cards: cards },
             cards: shuffledCards
         });
     };
 
+    // Inicia sessão de estudo com todos os cards
     const startStudyAllSession = () => {
         if (!currentDeck) return;
 
         const shuffledCards = [...cards].sort(() => Math.random() - 0.5);
-
         setStudyModalVisible(false);
 
         navigation.navigate('StudyDeck', {
@@ -199,6 +204,7 @@ export const DeckCardsScreen: React.FC = () => {
         });
     };
 
+    // Prepara dados do deck para edição
     const handleEditDeck = () => {
         if (!currentDeck) return;
 
@@ -209,7 +215,7 @@ export const DeckCardsScreen: React.FC = () => {
         setEditDeckModalVisible(true);
     };
 
-    // Lógica para permitir nomes iguais entre próprios e compartilhados
+    // Atualiza informações do deck com validação de nome único
     const updateDeck = async () => {
         if (!currentDeck || !editDeckData.title.trim()) {
             Toast.show({
@@ -221,16 +227,13 @@ export const DeckCardsScreen: React.FC = () => {
             return;
         }
 
-        // Verifica se o nome foi alterado
+        // Se nome não mudou, atualiza normalmente
         if (editDeckData.title.trim() === currentDeck.title) {
-            // Se o nome não mudou, permite a atualização normalmente
             try {
                 const description = editDeckData.description.trim();
-                const descriptionToSend = description;
-
                 const updatedDeck = await deckAPI.updateDeck(currentDeck.id, {
                     title: editDeckData.title.trim(),
-                    description: descriptionToSend
+                    description: description
                 });
 
                 setCurrentDeck(updatedDeck);
@@ -248,14 +251,12 @@ export const DeckCardsScreen: React.FC = () => {
             return;
         }
 
-        // Se o nome mudou, o backend trata a verificação diferenciada
+        // Se nome mudou, backend trata verificação de duplicata
         try {
             const description = editDeckData.description.trim();
-            const descriptionToSend = description;
-
             const updatedDeck = await deckAPI.updateDeck(currentDeck.id, {
                 title: editDeckData.title.trim(),
-                description: descriptionToSend
+                description: description
             });
 
             setCurrentDeck(updatedDeck);
@@ -268,7 +269,7 @@ export const DeckCardsScreen: React.FC = () => {
             setEditDeckModalVisible(false);
             Alert.alert('Sucesso', 'Deck atualizado com sucesso!');
         } catch (error: any) {
-            // Verifica se o erro é de nome duplicado vindo do backend
+            // Trata erro de nome duplicado
             if (error.response?.data?.error?.includes('já existe') ||
                 error.message?.includes('já existe')) {
                 Toast.show({
@@ -288,6 +289,7 @@ export const DeckCardsScreen: React.FC = () => {
         }
     };
 
+    // Prepara card selecionado para edição
     const handleEditCard = (card: Card) => {
         setSelectedCard(card);
         setEditCardData({
@@ -299,10 +301,12 @@ export const DeckCardsScreen: React.FC = () => {
         setEditCardModalVisible(true);
     };
 
+    // Valida e atualiza card existente
     const updateCard = async () => {
         const hasQuestionText = editCardData.question?.trim();
         const hasQuestionImage = editCardData.questionImage;
 
+        // Valida que pergunta tem texto ou imagem
         if (!hasQuestionText && !hasQuestionImage) {
             Alert.alert('Erro', 'A pergunta deve conter texto ou imagem');
             return;
@@ -320,6 +324,7 @@ export const DeckCardsScreen: React.FC = () => {
                 answer: editCardData.answer.trim()
             });
 
+            // Atualiza lista local de cards
             setCards(prev => prev.map(card =>
                 card.id === editCardData.id ? updatedCard : card
             ));
@@ -332,6 +337,7 @@ export const DeckCardsScreen: React.FC = () => {
         }
     };
 
+    // Gera mensagem de confirmação para exclusão de card
     const getDeleteCardMessage = () => {
         if (!selectedCard) return null;
 
@@ -347,18 +353,21 @@ export const DeckCardsScreen: React.FC = () => {
         );
     };
 
+    // Renderiza item individual da lista de cards
     const renderCard = ({ item }: { item: Card }) => (
         <View style={styles.cardItem}>
             <TouchableOpacity
                 style={styles.cardContent}
                 onPress={() => handleEditCard(item)}
             >
+                {/* Exibe texto da pergunta se existir */}
                 {item.question && item.question.trim() && (
                     <Text style={styles.cardQuestion} numberOfLines={2}>
                         {item.question}
                     </Text>
                 )}
 
+                {/* Exibe miniatura da imagem da pergunta se existir */}
                 {item.questionImage && (
                     <View style={styles.imageThumbnailContainer}>
                         <Image
@@ -369,6 +378,7 @@ export const DeckCardsScreen: React.FC = () => {
                     </View>
                 )}
 
+                {/* Seção da resposta com controle de visibilidade */}
                 <View style={styles.answerSection}>
                     <Text style={[
                         styles.cardAnswer,
@@ -379,6 +389,7 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </TouchableOpacity>
 
+            {/* Botão para excluir card */}
             <TouchableOpacity
                 onPress={() => handleDeleteCard(item.id)}
                 style={styles.deleteButton}
@@ -392,7 +403,7 @@ export const DeckCardsScreen: React.FC = () => {
         </View>
     );
 
-    // Função pickImage atualizada para usar upload real
+    // Seleciona imagem da galeria para upload
     const pickImage = async (isEdit: boolean = false) => {
         try {
             const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -414,6 +425,7 @@ export const DeckCardsScreen: React.FC = () => {
                     const uploadResponse = await uploadAPI.uploadImage(result.assets[0].uri);
                     const fullImageUrl = `${API_BASE_URL}${uploadResponse.imageUrl}`;
 
+                    // Atualiza dados do card em edição
                     if (isEdit) {
                         setEditCardData({
                             ...editCardData,
@@ -429,6 +441,7 @@ export const DeckCardsScreen: React.FC = () => {
         }
     };
 
+    // Exibe loading enquanto carrega dados
     if (loading || !currentDeck) {
         return (
             <View style={styles.loadingContainer}>
@@ -440,25 +453,21 @@ export const DeckCardsScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            {/* Modais - SEMPRE NO TOPO */}
+            {/* Modal para configurar sessão de estudo */}
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={studyModalVisible}
                 onRequestClose={() => setStudyModalVisible(false)}
-                accessibilityViewIsModal={true}
-                statusBarTranslucent={true}
             >
-                <View style={styles.modalOverlay}
-                    importantForAccessibility="yes"
-                >
+                <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Configurar Estudo</Text>
                         <Text style={styles.modalMessage}>
                             Este deck possui {cards.length} card{cards.length !== 1 ? 's' : ''}.
                         </Text>
 
-                        {/* CONTADOR */}
+                        {/* Contador para selecionar quantidade de cards */}
                         <View style={styles.counterContainer}>
                             <Text style={styles.counterLabel}>Quantidade de cards para estudar:</Text>
 
@@ -480,7 +489,6 @@ export const DeckCardsScreen: React.FC = () => {
                                     style={styles.counterInput}
                                     value={studyCardCount}
                                     onChangeText={(text) => {
-                                        // Permite apenas números
                                         const numericValue = text.replace(/[^0-9]/g, '');
                                         if (numericValue === '' || (parseInt(numericValue) >= 1 && parseInt(numericValue) <= cards.length)) {
                                             setStudyCardCount(numericValue);
@@ -536,17 +544,14 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </Modal>
 
+            {/* Modal para editar informações do deck */}
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={editDeckModalVisible}
                 onRequestClose={() => setEditDeckModalVisible(false)}
-                accessibilityViewIsModal={true}
-                statusBarTranslucent={true}
             >
-                <View style={styles.modalOverlay}
-                    importantForAccessibility="yes"
-                >
+                <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Editar Deck</Text>
 
@@ -584,17 +589,14 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </Modal>
 
+            {/* Modal para editar card existente */}
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={editCardModalVisible}
                 onRequestClose={() => setEditCardModalVisible(false)}
-                accessibilityViewIsModal={true}
-                statusBarTranslucent={true}
             >
-                <View style={styles.modalOverlay}
-                    importantForAccessibility="yes"
-                >
+                <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Editar Card</Text>
 
@@ -610,6 +612,7 @@ export const DeckCardsScreen: React.FC = () => {
                             numberOfLines={2}
                         />
 
+                        {/* Seção para upload de imagem */}
                         <View style={styles.imageSection}>
                             {editCardData.questionImage ? (
                                 <View style={styles.imagePreviewContainer}>
@@ -663,17 +666,14 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </Modal>
 
+            {/* Modal de confirmação para exclusão de card */}
             <Modal
                 animationType="slide"
                 transparent={true}
                 visible={deleteCardModalVisible}
                 onRequestClose={() => setDeleteCardModalVisible(false)}
-                accessibilityViewIsModal={true}
-                statusBarTranslucent={true}
             >
-                <View style={styles.modalOverlay}
-                    importantForAccessibility="yes"
-                >
+                <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
                         <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
                         {getDeleteCardMessage()}
@@ -695,15 +695,12 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </Modal>
 
-            {/* Conteúdo Principal - DEPOIS dos Modais */}
-
-            {/* Header com título e ícones */}
+            {/* Header com informações do deck e ações */}
             <View style={styles.header}>
                 <View style={styles.headerContent}>
-                    {/* Linha dos ícones alinhados à direita */}
+                    {/* Ícones de ação alinhados à direita */}
                     <View style={styles.iconsRow}>
                         <View style={styles.headerIcons}>
-                            {/* Ícone Editar - Cor do texto do título */}
                             <TouchableOpacity
                                 style={styles.editIcon}
                                 onPress={handleEditDeck}
@@ -711,7 +708,6 @@ export const DeckCardsScreen: React.FC = () => {
                                 <Icon name="edit" size={20} color="#333" />
                             </TouchableOpacity>
 
-                            {/* Ícone Compartilhar - Azul */}
                             <TouchableOpacity
                                 style={styles.shareIcon}
                                 onPress={handleShareDeck}
@@ -721,12 +717,12 @@ export const DeckCardsScreen: React.FC = () => {
                         </View>
                     </View>
 
-                    {/* Linha do título centralizado */}
+                    {/* Título do deck centralizado */}
                     <View style={styles.titleRow}>
                         <Text style={styles.deckTitle}>{currentDeck.title}</Text>
                     </View>
 
-                    {/* Badge "Compartilhado" */}
+                    {/* Badge indicando deck compartilhado */}
                     {isSharedDeck && (
                         <View style={styles.sharedDeckBadge}>
                             <Icon name="link" size={12} color="#FFF" />
@@ -734,19 +730,19 @@ export const DeckCardsScreen: React.FC = () => {
                         </View>
                     )}
 
-                    {/* Descrição */}
+                    {/* Descrição do deck se existir */}
                     {currentDeck.description != null && currentDeck.description.trim() !== '' && (
                         <Text style={styles.deckDescription}>{currentDeck.description}</Text>
                     )}
 
-                    {/* Contagem de cards */}
+                    {/* Contador de cards visíveis vs total */}
                     <Text style={styles.cardsCount}>
                         {filteredCards.length} de {cards.length} card{cards.length !== 1 ? 's' : ''}
                     </Text>
                 </View>
             </View>
 
-            {/* Barra de Pesquisa */}
+            {/* Barra de pesquisa para filtrar cards */}
             <View style={styles.searchSection}>
                 <View style={styles.searchContainer}>
                     <Icon name="search" size={20} color="#999" style={styles.searchIcon} />
@@ -765,9 +761,9 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             </View>
 
-            {/* Botão Estudar e Ícone Visibilidade */}
+            {/* Botões de ação principais */}
             <View style={styles.actionsRow}>
-                {/* Botão Estudar */}
+                {/* Botão para iniciar estudo */}
                 <TouchableOpacity
                     style={[
                         styles.studyButton,
@@ -780,7 +776,7 @@ export const DeckCardsScreen: React.FC = () => {
                     <Text style={styles.studyButtonText}>Estudar</Text>
                 </TouchableOpacity>
 
-                {/* Ícone Visibilidade */}
+                {/* Botão para alternar visibilidade das respostas */}
                 <TouchableOpacity
                     style={styles.visibilityIconButton}
                     onPress={() => setShowAllAnswers(!showAllAnswers)}
@@ -793,7 +789,7 @@ export const DeckCardsScreen: React.FC = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Lista de Cards ou Estado Vazio */}
+            {/* Lista de cards ou estado vazio */}
             {filteredCards.length === 0 ? (
                 <View style={styles.emptyContainer}>
                     <Icon name="content-paste-off" size={64} color="#CCC" />
@@ -827,7 +823,7 @@ export const DeckCardsScreen: React.FC = () => {
                 </View>
             )}
 
-            {/* FAB SEMPRE VISÍVEL */}
+            {/* Botão flutuante para criar novo card (visível apenas quando há cards) */}
             {cards.length > 0 && (
                 <View style={styles.fabContainer}>
                     <TouchableOpacity style={styles.fab} onPress={handleCreateCard}>

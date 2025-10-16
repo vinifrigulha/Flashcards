@@ -1,18 +1,19 @@
 import { cardModel } from "../models/cardModel.js";
 
-// Criar um novo card dentro de um deck
+// Cria um novo card de estudo em um deck específico
 export const createCard = async (req, res) => {
   const { deckId } = req.params;
   const { question, questionImage, answer } = req.body;
 
   try {
-    // Validação: pelo menos texto OU imagem na pergunta
+    // Valida se a pergunta tem pelo menos texto OU imagem
     if (!question?.trim() && !questionImage?.trim()) {
       return res.status(400).json({ 
         error: "A pergunta deve conter texto ou imagem." 
       });
     }
 
+    // Garante que a resposta não está vazia
     if (!answer?.trim()) {
       return res.status(400).json({ 
         error: "A resposta é obrigatória." 
@@ -33,13 +34,13 @@ export const createCard = async (req, res) => {
   }
 };
 
-// Atualizar um card
+// Atualiza um card existente
 export const updateCard = async (req, res) => {
   const { deckId, cardId } = req.params;
   const { question, questionImage, answer } = req.body;
 
   try {
-    // Validação: pelo menos texto OU imagem na pergunta
+    // Mesma validação da criação para manter consistência
     if (!question?.trim() && !questionImage?.trim()) {
       return res.status(400).json({ 
         error: "A pergunta deve conter texto ou imagem." 
@@ -69,7 +70,7 @@ export const updateCard = async (req, res) => {
   }
 };
 
-// Listar todos os cards de um deck
+// Lista todos os cards de um deck específico
 export const getCards = async (req, res) => {
   const { deckId } = req.params;
 
@@ -81,7 +82,7 @@ export const getCards = async (req, res) => {
   }
 };
 
-// Deletar um card
+// Remove um card específico
 export const deleteCard = async (req, res) => {
   const { deckId, cardId } = req.params;
 
@@ -93,7 +94,7 @@ export const deleteCard = async (req, res) => {
   }
 };
 
-// Deletar todos os cards de um deck
+// Remove todos os cards de um deck (limpeza completa)
 export const deleteAllCardsFromDeck = async (req, res) => {
   const { deckId } = req.params;
 

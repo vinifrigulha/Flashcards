@@ -15,12 +15,14 @@ import styles from './styles';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 
+// Ignora warnings específicos do React Native
 LogBox.ignoreLogs([
     'shadow',
     'pointerEvents',
     'Cannot record touch end without a touch start'
 ]);
 
+// Tela de cadastro para novos usuários com validação robusta de senha
 export const RegisterScreen: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -32,6 +34,7 @@ export const RegisterScreen: React.FC = () => {
     const { register } = useAuth();
     const navigation = useNavigation();
 
+    // Estados para validação de formulário
     const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     const [touched, setTouched] = useState({
@@ -43,9 +46,11 @@ export const RegisterScreen: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    // Alterna visibilidade da senha
     const toggleShowPassword = () => setShowPassword(!showPassword);
     const toggleShowConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
 
+    // Valida força da senha baseada em critérios de segurança
     const validatePassword = (password: string) => {
         const errors = [];
 
@@ -68,15 +73,15 @@ export const RegisterScreen: React.FC = () => {
         return errors;
     };
 
+    // Valida senha em tempo real durante a digitação
     const handlePasswordChange = (text: string) => {
         setPassword(text);
-        // SEMPRE valida a senha quando o usuário digita
         const errors = validatePassword(text);
         setPasswordErrors(errors);
         setShowPasswordRequirements(text.length > 0);
     };
 
-    // Valida a confirmação sempre que a senha mudar
+    // Valida confirmação de senha sempre que qualquer senha mudar
     useEffect(() => {
         if (confirmPassword) {
             setConfirmPasswordError(confirmPassword !== password ? 'As senhas não coincidem' : '');
@@ -87,6 +92,7 @@ export const RegisterScreen: React.FC = () => {
         setConfirmPassword(text);
     };
 
+    // Marca campos como tocados para mostrar erros
     const handleBlur = (field: 'password' | 'confirmPassword') => {
         setTouched(prev => ({ ...prev, [field]: true }));
     };
@@ -95,19 +101,17 @@ export const RegisterScreen: React.FC = () => {
         setShowPasswordRequirements(true);
     };
 
+    // Processa o envio do formulário de registro
     const handleSubmit = async () => {
         setTouched({ password: true, confirmPassword: true });
 
-        // Validação da senha
+        // Validações em ordem de prioridade
         const passwordValidationErrors = validatePassword(password);
         setPasswordErrors(passwordValidationErrors);
-
-        // Validação de confirmação de senha
         const confirmError = confirmPassword !== password ? 'As senhas não coincidem' : '';
         setConfirmPasswordError(confirmError);
 
-        // ⭐ ORDEM DE PRIORIDADE CORRIGIDA:
-        // 1. Primeiro verifica campos obrigatórios
+        // Verifica campos obrigatórios
         if (!name || !email || !password || !confirmPassword) {
             Toast.show({
                 type: 'error',
@@ -119,7 +123,7 @@ export const RegisterScreen: React.FC = () => {
             return;
         }
 
-        // 2. Verifica se email é válido
+        // Valida formato do email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             Toast.show({
@@ -132,7 +136,7 @@ export const RegisterScreen: React.FC = () => {
             return;
         }
 
-        // 3. ⭐ PRIMEIRO verifica erros da senha (MAIOR PRIORIDADE)
+        // Valida força da senha
         if (passwordValidationErrors.length > 0) {
             const errorMessage = passwordValidationErrors.length === 1
                 ? passwordValidationErrors[0]
@@ -148,7 +152,7 @@ export const RegisterScreen: React.FC = () => {
             return;
         }
 
-        // 4. ⭐ DEPOIS verifica confirmação de senha
+        // Valida confirmação de senha
         if (confirmError) {
             Toast.show({
                 type: 'error',
@@ -160,9 +164,8 @@ export const RegisterScreen: React.FC = () => {
             return;
         }
 
-        // Se passou por todas as validações, tenta o registro
+        // Tenta registrar usuário após todas as validações
         setLoading(true);
-
         try {
             await register({ name, email, password });
             setShowSuccessModal(true);
@@ -206,7 +209,7 @@ export const RegisterScreen: React.FC = () => {
                 <Text style={styles.title}>Criar Conta</Text>
                 <Text style={styles.subtitle}>Preencha os dados para se cadastrar</Text>
 
-                {/* NOME COMPLETO */}
+                {/* Campo de nome completo */}
                 <TextInput
                     style={styles.input}
                     placeholder="Nome completo"
@@ -217,7 +220,7 @@ export const RegisterScreen: React.FC = () => {
                     editable={!loading}
                 />
 
-                {/* E-MAIL */}
+                {/* Campo de email */}
                 <TextInput
                     style={styles.input}
                     placeholder="E-mail"
@@ -229,7 +232,7 @@ export const RegisterScreen: React.FC = () => {
                     editable={!loading}
                 />
 
-                {/* SENHA */}
+                {/* Campo de senha com ícone de visibilidade */}
                 <View style={styles.passwordInputContainer}>
                     <TextInput
                         style={[
@@ -260,7 +263,7 @@ export const RegisterScreen: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* EXIBIÇÃO DOS ERROS - APENAS O QUE ESTÁ FALTANDO */}
+                {/* Exibe erros de validação da senha */}
                 {showPasswordRequirements && passwordErrors.length > 0 && (
                     <View style={styles.passwordErrorsContainer}>
                         {passwordErrors.map((error, index) => (
@@ -269,13 +272,13 @@ export const RegisterScreen: React.FC = () => {
                     </View>
                 )}
 
-                {/* CONFIRMAR SENHA */}
+                {/* Campo de confirmação de senha */}
                 <View style={styles.passwordInputContainer}>
                     <TextInput
                         style={[
                             styles.input,
                             styles.passwordInput,
-                            confirmPasswordError && styles.inputError, // ⭐ ESTE ESTÁ IMPORTANTE
+                            confirmPasswordError && styles.inputError,
                         ]}
                         placeholder="Confirmar senha"
                         placeholderTextColor="#999"
@@ -299,11 +302,12 @@ export const RegisterScreen: React.FC = () => {
                     </TouchableOpacity>
                 </View>
 
-                {/* ⭐ EXIBIÇÃO DO ERRO DE CONFIRMAÇÃO */}
+                {/* Exibe erro de confirmação de senha */}
                 {confirmPasswordError ? (
                     <Text style={styles.errorText}>{confirmPasswordError}</Text>
                 ) : null}
 
+                {/* Botão de registro */}
                 <TouchableOpacity
                     style={[styles.button, loading && styles.buttonDisabled]}
                     onPress={handleSubmit}
@@ -316,6 +320,7 @@ export const RegisterScreen: React.FC = () => {
                     )}
                 </TouchableOpacity>
 
+                {/* Link para tela de login */}
                 <TouchableOpacity style={styles.loginLink} onPress={handleLogin}>
                     <Text style={styles.loginText}>
                         Já tem uma conta? <Text style={styles.loginTextBold}>Faça login</Text>
@@ -323,6 +328,7 @@ export const RegisterScreen: React.FC = () => {
                 </TouchableOpacity>
             </ScrollView>
 
+            {/* Modal de sucesso após registro */}
             <Modal
                 visible={showSuccessModal}
                 transparent={true}
@@ -332,12 +338,8 @@ export const RegisterScreen: React.FC = () => {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>
-                            ✅ Sucesso!
-                        </Text>
-                        <Text style={styles.modalMessage}>
-                            Usuário criado com sucesso!
-                        </Text>
+                        <Text style={styles.modalTitle}>✅ Sucesso!</Text>
+                        <Text style={styles.modalMessage}>Usuário criado com sucesso!</Text>
                         <TouchableOpacity
                             style={styles.modalButton}
                             onPress={handleSuccessModalClose}
