@@ -37,6 +37,7 @@ export const UseShareCodeScreen: React.FC = () => {
     const navigation = useNavigation<UseShareCodeScreenNavigationProp>();
     const { user } = useAuth();
 
+    // Configuração do header
     React.useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Usar Código',
@@ -44,6 +45,7 @@ export const UseShareCodeScreen: React.FC = () => {
         });
     }, [navigation]);
 
+    // Pré-visualização do deck baseado no código
     const handlePreview = async () => {
         if (!shareCode.trim()) {
             Alert.alert('Erro', 'Digite um código de compartilhamento');
@@ -62,6 +64,7 @@ export const UseShareCodeScreen: React.FC = () => {
         }
     };
 
+    // Uso do código para adicionar deck à coleção
     const handleUseCode = async () => {
         if (!previewData) return;
 
@@ -71,10 +74,10 @@ export const UseShareCodeScreen: React.FC = () => {
             const newDeck: Deck = response.data.deck;
 
             if (!newDeck) {
-                console.error('❌ Deck não veio na resposta');
                 throw new Error('Deck não retornado na resposta da API');
             }
 
+            // Navega para o deck recém-adicionado
             navigation.replace('DeckCards', {
                 deck: newDeck
             });
@@ -83,7 +86,6 @@ export const UseShareCodeScreen: React.FC = () => {
             setPreviewData(null);
 
         } catch (error: any) {
-            console.error('❌ Erro detalhado ao usar código:', error);
             const errorMessage = error.response?.data?.error || error.message || 'Não foi possível usar o código';
             Alert.alert('Erro', errorMessage);
         } finally {
@@ -96,10 +98,9 @@ export const UseShareCodeScreen: React.FC = () => {
         setShareCode('');
     };
 
-    // Função para abrir o scanner
+    // Abertura do scanner de QR Code
     const openScanner = async () => {
         if (!permission) {
-            // Ainda carregando permissões
             return;
         }
 
@@ -115,13 +116,13 @@ export const UseShareCodeScreen: React.FC = () => {
         setScanning(true);
     };
 
-    // Função para fechar o scanner
+    // Fechamento do scanner
     const closeScanner = () => {
         setShowScanner(false);
         setScanning(false);
     };
 
-    // Função chamada quando um QR Code é detectado
+    // Processamento do QR Code escaneado
     const onQRCodeScanned = ({ data }: { data: string }) => {
         if (!scanning) return;
 
@@ -132,7 +133,6 @@ export const UseShareCodeScreen: React.FC = () => {
             setShareCode(qrCode);
             setShowScanner(false);
 
-            // Mostra feedback visual
             Alert.alert(
                 'QR Code Lido!',
                 `Código: ${qrCode}\n\nClique em "Visualizar" para continuar.`,
@@ -147,6 +147,7 @@ export const UseShareCodeScreen: React.FC = () => {
         }
     };
 
+    // Validações do código
     const isCodeExpired = previewData && previewData.expiresAt
         ? new Date(previewData.expiresAt) < new Date()
         : false;
@@ -159,7 +160,7 @@ export const UseShareCodeScreen: React.FC = () => {
 
     const canUseCode = previewData && !isCodeExpired && !isMaxUsesReached && !isOwnDeck;
 
-    // Tela do Scanner
+    // Tela do Scanner de QR Code
     if (showScanner) {
         return (
             <View style={styles.scannerContainer}>
@@ -191,7 +192,7 @@ export const UseShareCodeScreen: React.FC = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {/* Input Section */}
+            {/* Seção de entrada do código */}
             <View style={styles.inputSection}>
                 <Text style={styles.sectionTitle}>Digite o código de compartilhamento</Text>
 
@@ -236,7 +237,7 @@ export const UseShareCodeScreen: React.FC = () => {
                 )}
             </View>
 
-            {/* Preview Section */}
+            {/* Seção de pré-visualização */}
             {previewData && (
                 <View style={styles.previewSection}>
                     <Text style={styles.sectionTitle}>Pré-visualização do Deck</Text>
@@ -274,7 +275,7 @@ export const UseShareCodeScreen: React.FC = () => {
                             </Text>
                         </View>
 
-                        {/* Status Messages */}
+                        {/* Mensagens de status */}
                         {isCodeExpired && (
                             <Text style={styles.errorText}>❌ Este código expirou</Text>
                         )}
@@ -292,7 +293,7 @@ export const UseShareCodeScreen: React.FC = () => {
                         )}
                     </View>
 
-                    {/* Action Buttons */}
+                    {/* Botões de ação */}
                     <View style={styles.actionButtons}>
                         <TouchableOpacity
                             style={[styles.actionButton, styles.cancelButton]}
@@ -320,7 +321,7 @@ export const UseShareCodeScreen: React.FC = () => {
                 </View>
             )}
 
-            {/* Instructions */}
+            {/* Instruções de uso */}
             <View style={styles.instructions}>
                 <Text style={styles.instructionsTitle}>Como funciona?</Text>
                 <Text style={styles.instruction}>1. Use um código de compartilhamento de 6 caracteres</Text>

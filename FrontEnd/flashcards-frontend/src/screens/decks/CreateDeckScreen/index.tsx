@@ -22,6 +22,7 @@ export const CreateDeckScreen: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const navigation = useNavigation<CreateDeckScreenNavigationProp>();
 
+    // Submissão do formulário de criação de deck
     const handleSubmit = async () => {
         if (!formData.title.trim()) {
             Alert.alert('Erro', 'O título do deck é obrigatório');
@@ -30,16 +31,14 @@ export const CreateDeckScreen: React.FC = () => {
 
         setLoading(true);
         try {
-            // ✅ Buscar os decks existentes para verificar duplicatas
+            // Verificar decks existentes para evitar duplicatas
             const existingDecks = await deckAPI.getDecks();
 
-            // ✅ Verificar se já existe um deck com o MESMO título
             const isDuplicate = existingDecks.some((deck: any) => {
                 return deck.title.trim().toLowerCase() === formData.title.trim().toLowerCase();
             });
 
             if (isDuplicate) {
-                // ✅ Toast no TOPO informando sobre deck duplicado
                 Toast.show({
                     type: 'error',
                     text1: 'Deck já existe',
@@ -52,22 +51,21 @@ export const CreateDeckScreen: React.FC = () => {
                 return;
             }
 
-            // Se não é duplicado, cria o deck
+            // Criar novo deck
             const newDeck = await deckAPI.createDeck({
                 title: formData.title.trim(),
                 description: formData.description.trim() || undefined,
             });
 
-            // Navega para a tela do deck recém-criado
+            // Navegar para o deck recém-criado
             navigation.reset({
                 index: 1,
                 routes: [
-                    { name: 'Decks' }, // Tela inicial
-                    { name: 'DeckCards', params: { deck: newDeck } } // Tela do deck criado
+                    { name: 'Decks' },
+                    { name: 'DeckCards', params: { deck: newDeck } }
                 ],
             });
         } catch (error: any) {
-            // ✅ Toast de erro
             Toast.show({
                 type: 'error',
                 text1: 'Erro ao criar deck',
@@ -92,6 +90,7 @@ export const CreateDeckScreen: React.FC = () => {
                 Organize seus flashcards em decks temáticos
             </Text>
 
+            {/* Formulário de criação */}
             <View style={styles.form}>
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Título *</Text>
@@ -129,6 +128,7 @@ export const CreateDeckScreen: React.FC = () => {
                 </View>
             </View>
 
+            {/* Botões de ação */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={[styles.button, styles.cancelButton]}

@@ -1,10 +1,24 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+    // Layout principal
     container: {
         flex: 1,
         backgroundColor: '#F5F5F5',
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+    },
+    loadingText: {
+        marginTop: 12,
+        fontSize: 16,
+        color: '#666',
+    },
+
+    // Header
     header: {
         backgroundColor: '#FFF',
         padding: 20,
@@ -20,7 +34,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        marginBottom: 2, // Espaçamento reduzido ainda mais
+        marginBottom: 2,
     },
     screenTitle: {
         fontSize: 24,
@@ -30,15 +44,15 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: 16,
         color: '#666',
-        marginTop: 2, // Espaçamento mínimo
+        marginTop: 2,
     },
     logoutButton: {
         padding: 8,
-        backgroundColor: '#FF3B30', // Cor mais visível para teste
+        backgroundColor: '#FF3B30',
         borderRadius: 8,
         marginLeft: 10,
-        minWidth: 40, // Garante tamanho mínimo
-        minHeight: 40, // Garante tamanho mínimo
+        minWidth: 40,
+        minHeight: 40,
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -50,17 +64,55 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
+
+    // Busca e importação
+    searchSection: {
+        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        gap: 12,
     },
-    loadingText: {
-        marginTop: 12,
+    searchContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFF',
+        borderRadius: 12,
+        paddingHorizontal: 12,
+        borderWidth: 1,
+        borderColor: '#E5E5E5',
+    },
+    searchIcon: {
+        marginRight: 4,
+    },
+    searchInput: {
+        flex: 1,
+        paddingVertical: 12,
+        paddingHorizontal: 8,
         fontSize: 16,
-        color: '#666',
     },
+    clearButton: {
+        padding: 4,
+    },
+    importButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#007AFF',
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#007AFF',
+        gap: 8,
+    },
+    importButtonText: {
+        color: '#FFF',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+
+    // Lista de decks
     list: {
         padding: 16,
     },
@@ -77,9 +129,20 @@ const styles = StyleSheet.create({
         elevation: 3,
         alignItems: 'flex-start',
     },
+    sharedDeckItem: {
+        backgroundColor: '#F8F9FA',
+        borderLeftWidth: 4,
+        borderLeftColor: '#007AFF',
+    },
     deckContent: {
         flex: 1,
         marginRight: 12,
+    },
+    deckHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 4,
     },
     deckTitle: {
         fontSize: 18,
@@ -103,9 +166,37 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#999',
     },
+
+    // Ações do deck
+    deckActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    shareButton: {
+        padding: 8,
+    },
     deleteButton: {
         padding: 4,
     },
+
+    // Badge de deck compartilhado
+    sharedBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#007AFF',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        gap: 4,
+    },
+    sharedBadgeText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: '600',
+    },
+
+    // Estado vazio
     emptyContainer: {
         flex: 1,
         justifyContent: 'center',
@@ -126,6 +217,12 @@ const styles = StyleSheet.create({
         marginBottom: 24,
         lineHeight: 22,
     },
+    emptyActions: {
+        flexDirection: 'column',
+        gap: 12,
+        marginTop: 16,
+        width: '100%',
+    },
     createButton: {
         backgroundColor: '#007AFF',
         paddingHorizontal: 24,
@@ -140,6 +237,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         textAlign: 'center',
     },
+
+    // Botão flutuante
     fab: {
         position: 'absolute',
         right: 20,
@@ -157,7 +256,7 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
 
-    // Estilos dos Modais
+    // Modais
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -194,6 +293,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#333',
     },
+    sharedWarning: {
+        color: '#FF9500',
+        fontSize: 14,
+        fontStyle: 'italic',
+        marginTop: 8,
+    },
     modalButtons: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -223,141 +328,6 @@ const styles = StyleSheet.create({
     deleteButtonTextModal: {
         color: 'white',
         fontSize: 16,
-        fontWeight: '600',
-    },
-    logoutButtonModal: {
-        backgroundColor: '#FF3B30',
-        borderWidth: 1,
-        borderColor: '#FF3B30',
-    },
-
-    logoutButtonTextModal: {
-        color: '#FFF',
-        fontWeight: '600',
-    },
-    searchInput: {
-        flex: 1,
-        paddingVertical: 12,
-        paddingHorizontal: 8,
-        fontSize: 16,
-    },
-    searchIcon: {
-        marginRight: 4,
-    },
-    clearButton: {
-        padding: 4,
-    },
-    // Novos estilos para funcionalidades de compartilhamento
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    useCodeButton: {
-        padding: 8,
-    },
-    useCodeButtonEmpty: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#F0F8FF',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#007AFF',
-        gap: 8,
-    },
-    useCodeButtonText: {
-        color: '#007AFF',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    deckActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    shareButton: {
-        padding: 8,
-    },
-    sharedDeckItem: {
-        backgroundColor: '#F8F9FA',
-        borderLeftWidth: 4,
-        borderLeftColor: '#007AFF',
-    },
-    deckHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginBottom: 4,
-    },
-    sharedBadge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#007AFF',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-        gap: 4,
-    },
-    sharedBadgeText: {
-        color: '#FFF',
-        fontSize: 10,
-        fontWeight: '600',
-    },
-    sharedWarning: {
-        color: '#FF9500',
-        fontSize: 14,
-        fontStyle: 'italic',
-        marginTop: 8,
-    },
-    emptyActions: {
-        flexDirection: 'column',
-        gap: 12,
-        marginTop: 16,
-        width: '100%',
-    },
-    fabContainer: {
-        position: 'absolute',
-        bottom: 20,
-        right: 20,
-        gap: 12,
-    },
-    useCodeFab: {
-        backgroundColor: '#34C759',
-    },
-    // Seção de busca e importar
-    searchSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        gap: 12,
-    },
-    searchContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFF',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        borderWidth: 1,
-        borderColor: '#E5E5E5',
-    },
-    importButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#007AFF',
-        paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#007AFF',
-        gap: 8,
-    },
-    importButtonText: {
-        color: '#FFF',
-        fontSize: 14,
         fontWeight: '600',
     },
 });

@@ -37,6 +37,7 @@ export const ShareDeckScreen: React.FC = () => {
 
     const hasActiveCodes = shareCodes.length > 0;
 
+    // Configuração do header da tela
     React.useEffect(() => {
         navigation.setOptions({
             headerTitle: 'Compartilhar Deck',
@@ -44,15 +45,16 @@ export const ShareDeckScreen: React.FC = () => {
         });
     }, [navigation]);
 
+    // Carrega códigos de compartilhamento ao montar o componente
     useEffect(() => {
         loadShareCodes();
     }, []);
 
+    // Copia código para área de transferência
     const copyToClipboard = async (shareCodeString: string) => {
         try {
             await Clipboard.setString(shareCodeString);
 
-            // ✅ Toast de sucesso personalizado
             Toast.show({
                 type: 'success',
                 text1: 'Código Copiado!',
@@ -67,6 +69,7 @@ export const ShareDeckScreen: React.FC = () => {
         }
     };
 
+    // Copia código do modal para área de transferência
     const copyToClipboardFromModal = async () => {
         if (!selectedShareCode) return;
 
@@ -74,7 +77,6 @@ export const ShareDeckScreen: React.FC = () => {
             await Clipboard.setString(selectedShareCode);
             setShowCopiedMessage(true);
 
-            // ✅ Toast também no modal
             Toast.show({
                 type: 'success',
                 text1: 'Código Copiado!',
@@ -93,6 +95,7 @@ export const ShareDeckScreen: React.FC = () => {
         }
     };
 
+    // Carrega códigos de compartilhamento do servidor
     const loadShareCodes = async () => {
         try {
             setLoading(true);
@@ -104,13 +107,13 @@ export const ShareDeckScreen: React.FC = () => {
                 : [];
             setShareCodes(deckShareCodes);
         } catch (error) {
-            console.error('Erro ao carregar códigos:', error);
             Alert.alert('Erro', 'Não foi possível carregar os códigos de compartilhamento');
         } finally {
             setLoading(false);
         }
     };
 
+    // Gera novo código de compartilhamento
     const generateShareCode = async () => {
         if (shareCodes.length > 0) {
             Toast.show({
@@ -128,7 +131,6 @@ export const ShareDeckScreen: React.FC = () => {
             const response = await deckShareApi.generateShareCode(deck.id, 7, undefined);
 
             if (response.data) {
-
                 const newShareCode: DeckShare = {
                     id: response.data.id || Date.now(),
                     shareCode: response.data.shareCode,
@@ -146,7 +148,6 @@ export const ShareDeckScreen: React.FC = () => {
                 };
 
                 if (!newShareCode.shareCode) {
-                    console.warn('Resposta da API incompleta:', response.data);
                     throw new Error('Resposta da API incompleta - falta shareCode');
                 }
 
@@ -155,7 +156,6 @@ export const ShareDeckScreen: React.FC = () => {
                 throw new Error('Resposta da API vazia');
             }
         } catch (error: any) {
-            console.error('Erro ao gerar código:', error);
             Toast.show({
                 type: 'error',
                 text1: 'Erro',
@@ -168,6 +168,7 @@ export const ShareDeckScreen: React.FC = () => {
         }
     };
 
+    // Revoga código de compartilhamento
     const revokeShareCode = async (shareId: number) => {
         try {
             setRevoking(shareId.toString());
@@ -180,7 +181,6 @@ export const ShareDeckScreen: React.FC = () => {
 
             setShareCodes(prev => prev.filter(code => code.id !== shareId));
 
-            // ✅ Toast de sucesso para revogação
             Toast.show({
                 type: 'success',
                 text1: 'Código Revogado',
@@ -189,8 +189,6 @@ export const ShareDeckScreen: React.FC = () => {
                 visibilityTime: 3000,
             });
         } catch (error: any) {
-            console.error('Erro ao revogar código:', error);
-
             const isTemporaryId = shareId > 1000000000;
             if (isTemporaryId) {
                 setShareCodes(prev => prev.filter(code => code.id !== shareId));
@@ -208,6 +206,7 @@ export const ShareDeckScreen: React.FC = () => {
         }
     };
 
+    // Compartilha código via sistema nativo
     const shareCode = (shareCodeString: string) => {
         const shareUrl = `flashcards://deck-share/${shareCodeString}`;
         const message = `Estou compartilhando o deck "${deck.title}" com você!\n\nUse o código: ${shareCodeString}\n\nOu escaneie o QR Code no app.`;
@@ -218,11 +217,13 @@ export const ShareDeckScreen: React.FC = () => {
         });
     };
 
+    // Exibe modal com QR Code
     const showQRCode = (shareCodeString: string) => {
         setSelectedShareCode(shareCodeString);
         setQrModalVisible(true);
     };
 
+    // Utilitários para formatação e validação
     const formatDate = (dateString: string | null) => {
         if (!dateString) return 'Sem expiração';
         try {
@@ -277,7 +278,7 @@ export const ShareDeckScreen: React.FC = () => {
                                     color="black"
                                 />
 
-                                {/* ✅ Mensagem de código copiado */}
+                                {/* Mensagem de código copiado */}
                                 <View style={styles.messageContainer}>
                                     {showCopiedMessage && (
                                         <View style={styles.copiedMessage}>
@@ -292,7 +293,6 @@ export const ShareDeckScreen: React.FC = () => {
                         )}
 
                         <View style={styles.modalButtons}>
-                            {/* ✅ Botão de Copiar */}
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.copyButton]}
                                 onPress={copyToClipboardFromModal}
@@ -315,7 +315,7 @@ export const ShareDeckScreen: React.FC = () => {
                 </View>
             </Modal>
 
-            {/* Deck Info */}
+            {/* Informações do deck */}
             <View style={styles.deckInfo}>
                 <Text style={styles.deckTitle}>{deck.title}</Text>
                 {deck.description && (
@@ -326,7 +326,7 @@ export const ShareDeckScreen: React.FC = () => {
                 </Text>
             </View>
 
-            {/* Generate Button */}
+            {/* Botão para gerar código */}
             <TouchableOpacity
                 style={[
                     styles.generateButton,
@@ -347,7 +347,7 @@ export const ShareDeckScreen: React.FC = () => {
                 )}
             </TouchableOpacity>
 
-            {/* Share Codes List */}
+            {/* Lista de códigos de compartilhamento */}
             <ScrollView style={styles.codesList}>
                 {shareCodes.length === 0 ? (
                     <View style={styles.emptyContainer}>
@@ -379,7 +379,6 @@ export const ShareDeckScreen: React.FC = () => {
                             </View>
 
                             <View style={styles.codeActions}>
-                                {/* ✅ BOTÃO COPIAR ADICIONADO PRIMEIRO */}
                                 <TouchableOpacity
                                     style={styles.actionButton}
                                     onPress={() => copyToClipboard(code.shareCode)}
@@ -418,7 +417,7 @@ export const ShareDeckScreen: React.FC = () => {
                 )}
             </ScrollView>
 
-            {/* ✅ Componente Toast */}
+            {/* Componente Toast para notificações */}
             <Toast />
         </View>
     );
