@@ -21,6 +21,7 @@ type RouteParams = {
     deckId: number;
 };
 
+// Tela para criação de novos cards de estudo
 export const CreateCardScreen: React.FC = () => {
     const [formData, setFormData] = useState({
         question: '',
@@ -34,6 +35,7 @@ export const CreateCardScreen: React.FC = () => {
     const { deckId } = route.params as RouteParams;
     const API_BASE_URL = 'http://localhost:3000';
 
+    // Seleciona imagem da galeria e faz upload
     const pickImage = async () => {
         try {
             const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -53,13 +55,9 @@ export const CreateCardScreen: React.FC = () => {
             if (!result.canceled && result.assets[0].uri) {
                 setUploadingImage(true);
                 try {
-                    // FAZ UPLOAD REAL DA IMAGEM
                     const uploadResponse = await uploadAPI.uploadImage(result.assets[0].uri);
-
-                    // Construir URL completa da imagem
                     const fullImageUrl = `${API_BASE_URL}${uploadResponse.imageUrl}`;
 
-                    // Atualizar formData (não editCardData)
                     setFormData({
                         ...formData,
                         questionImage: fullImageUrl
@@ -83,8 +81,8 @@ export const CreateCardScreen: React.FC = () => {
         });
     };
 
+    // Valida e cria novo card no deck
     const handleSubmit = async () => {
-        // Validação: pelo menos texto OU imagem na pergunta
         if (!formData.question?.trim() && !formData.questionImage) {
             Alert.alert('Erro', 'A pergunta deve conter texto ou imagem');
             return;
@@ -97,10 +95,9 @@ export const CreateCardScreen: React.FC = () => {
 
         setLoading(true);
         try {
-            // ✅ Buscar os cards existentes para verificar duplicatas
             const existingCards = await cardAPI.getCards(deckId);
 
-            // ✅ Verificar se já existe um card com a MESMA pergunta e resposta
+            // Verifica se já existe card idêntico
             const isDuplicate = existingCards.some((card: any) => {
                 const sameQuestion = card.question?.trim().toLowerCase() === formData.question?.trim().toLowerCase();
                 const sameAnswer = card.answer.trim().toLowerCase() === formData.answer.trim().toLowerCase();
@@ -119,16 +116,13 @@ export const CreateCardScreen: React.FC = () => {
                 return;
             }
 
-            // ⭐ CORREÇÃO: Usar URL completa da imagem
             const cardData = {
                 question: formData.question?.trim() || null,
-                questionImage: formData.questionImage, // Já é a URL completa
+                questionImage: formData.questionImage,
                 answer: formData.answer.trim(),
             };
-            // Se não é duplicado, cria o card
-            await cardAPI.createCard(deckId, cardData);
 
-            // ⭐ CORREÇÃO: Navegação mais suave
+            await cardAPI.createCard(deckId, cardData);
             navigation.goBack();
 
         } catch (error: any) {
@@ -156,14 +150,13 @@ export const CreateCardScreen: React.FC = () => {
             </Text>
 
             <View style={styles.form}>
-                {/* Campo Pergunta com Imagem */}
+                {/* Seção da pergunta com opção de imagem */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Pergunta *</Text>
                     <Text style={styles.hint}>
                         (texto, imagem ou ambos)
                     </Text>
 
-                    {/* Campo de texto - agora opcional */}
                     <TextInput
                         style={[styles.input, styles.textArea]}
                         placeholder="Digite a pergunta (opcional se adicionar imagem)..."
@@ -180,7 +173,7 @@ export const CreateCardScreen: React.FC = () => {
                         {formData.question?.length || 0}/500 caracteres
                     </Text>
 
-                    {/* Seção de Imagem */}
+                    {/* Upload de imagem */}
                     <View style={styles.imageSection}>
                         {formData.questionImage ? (
                             <View style={styles.imagePreviewContainer}>
@@ -217,7 +210,7 @@ export const CreateCardScreen: React.FC = () => {
                     </View>
                 </View>
 
-                {/* Campo Resposta */}
+                {/* Campo da resposta */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.label}>Resposta *</Text>
                     <TextInput
@@ -238,6 +231,7 @@ export const CreateCardScreen: React.FC = () => {
                 </View>
             </View>
 
+            {/* Botões de ação */}
             <View style={styles.buttonContainer}>
                 <TouchableOpacity
                     style={[styles.button, styles.cancelButton]}

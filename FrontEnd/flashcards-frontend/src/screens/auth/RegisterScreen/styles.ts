@@ -3,19 +3,16 @@ import { StyleSheet, Dimensions } from 'react-native';
 const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
-    // ===== ESTILOS PRINCIPAIS =====
+    // Layout principal
     container: {
         flexGrow: 1,
         padding: 20,
         backgroundColor: '#fff',
-        justifyContent: 'center', // ADICIONE ISSO PARA CENTRALIZAR
-        minHeight: '100%', // GARANTE QUE OCUPE TODA A ALTURA
+        justifyContent: 'center',
+        minHeight: '100%',
     },
 
-    headerContainer: {
-        marginBottom: 30, // AUMENTEI PARA MAIS ESPAÇO
-    },
-
+    // Textos
     title: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -23,7 +20,6 @@ export default StyleSheet.create({
         marginBottom: 8,
         textAlign: 'center',
     },
-
     subtitle: {
         fontSize: 16,
         color: '#666',
@@ -31,7 +27,7 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
 
-    // ===== INPUTS =====
+    // Campos de entrada
     input: {
         width: '100%',
         height: 50,
@@ -41,7 +37,7 @@ export default StyleSheet.create({
         paddingHorizontal: 15,
         fontSize: 16,
         backgroundColor: '#fff',
-        marginBottom: 20, // MESMO ESPAÇAMENTO PARA TODOS OS CAMPOS
+        marginBottom: 20,
     },
     passwordInputContainer: {
         position: 'relative',
@@ -59,26 +55,9 @@ export default StyleSheet.create({
         borderColor: '#ff3b30',
     },
 
-    // ===== VALIDAÇÃO =====
-    requirementsContainer: {
-        marginTop: 8,
-        marginBottom: 16,
-        padding: 12,
-        backgroundColor: '#fff3cd',
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: '#ffeaa7',
-    },
-    requirementsTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#856404',
-        marginBottom: 4,
-    },
-    requirementMissing: {
-        fontSize: 12,
-        color: '#856404',
-        marginLeft: 8,
+    // Validação e erros
+    passwordErrorsContainer: {
+        marginBottom: 12,
     },
     errorText: {
         color: '#dc3545',
@@ -86,9 +65,9 @@ export default StyleSheet.create({
         marginBottom: 2,
     },
 
-    // ===== BOTÕES =====
+    // Botões
     button: {
-        backgroundColor: '#4CAF50', // VERDE como estava antes
+        backgroundColor: '#4CAF50',
         height: 50,
         borderRadius: 8,
         justifyContent: 'center',
@@ -105,7 +84,7 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
 
-    // ===== LINK DE LOGIN =====
+    // Links de navegação
     loginLink: {
         alignItems: 'center',
     },
@@ -118,7 +97,7 @@ export default StyleSheet.create({
         fontWeight: '600',
     },
 
-    // ===== MODAL =====
+    // Modal de sucesso
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -158,7 +137,7 @@ export default StyleSheet.create({
         color: '#333'
     },
     modalButton: {
-        backgroundColor: '#4CAF50', // VERDE como estava antes
+        backgroundColor: '#4CAF50',
         padding: 15,
         borderRadius: 8,
         marginTop: 10
@@ -168,44 +147,5 @@ export default StyleSheet.create({
         textAlign: 'center',
         fontWeight: 'bold',
         fontSize: 16
-    },
-    passwordErrorsContainer: {
-        marginBottom: 12,
-    },
-    passwordRequirementsTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 8,
-        color: '#495057',
-    },
-    passwordRequirementText: {
-        fontSize: 12,
-        marginBottom: 4,
-    },
-    requirementValid: {
-        color: '#28a745',
-        fontWeight: '500',
-    },
-    requirementInvalid: {
-        color: '#6c757d',
-    },
-    currentErrorsContainer: {
-        marginBottom: 16,
-        padding: 12,
-        backgroundColor: '#fff3cd',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#ffeaa7',
-    },
-    currentErrorsTitle: {
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 6,
-        color: '#856404',
-    },
-    currentErrorText: {
-        fontSize: 12,
-        color: '#856404',
-        marginBottom: 2,
     },
 });

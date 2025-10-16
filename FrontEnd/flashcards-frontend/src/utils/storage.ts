@@ -1,8 +1,6 @@
-// Utilitários para gerenciamento de storage de forma segura
+// Utilitários para gerenciamento seguro do localStorage no navegador
 
-/**
- * Salva um item no localStorage com tratamento de erro
- */
+// Salva um item no localStorage com tratamento de erro
 export const setItem = (key: string, value: any): boolean => {
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -17,9 +15,7 @@ export const setItem = (key: string, value: any): boolean => {
     }
 };
 
-/**
- * Recupera um item do localStorage com tratamento de erro
- */
+// Recupera um item do localStorage com tratamento de erro
 export const getItem = <T>(key: string, defaultValue?: T): T | null => {
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -36,9 +32,7 @@ export const getItem = <T>(key: string, defaultValue?: T): T | null => {
     }
 };
 
-/**
- * Remove um item do localStorage
- */
+// Remove um item do localStorage
 export const removeItem = (key: string): boolean => {
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -52,9 +46,7 @@ export const removeItem = (key: string): boolean => {
     }
 };
 
-/**
- * Limpa todo o localStorage
- */
+// Limpa todo o localStorage
 export const clear = (): boolean => {
     try {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -68,7 +60,7 @@ export const clear = (): boolean => {
     }
 };
 
-// Chaves específicas do aplicativo
+// Chaves específicas do aplicativo para organização
 export const STORAGE_KEYS = {
     TOKEN: 'token',
     USER: 'user',

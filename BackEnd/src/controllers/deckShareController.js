@@ -1,19 +1,19 @@
 import { deckShareModel } from "../models/deckShareModel.js";
 import { deckModel } from "../models/deckModel.js";
 
-// Gerar código de compartilhamento
+// Gera um código único para compartilhar decks
 export const generateShareCode = async (req, res) => {
   try {
     const { deckId, expiresInDays = 7, maxUses = null } = req.body;
     const userId = req.user.userId;
 
-    // Verificar se o deck pertence ao usuário
+    // Verifica se o usuário é dono do deck
     const deck = await deckModel.findDeckById(parseInt(deckId), userId);
     if (!deck) {
       return res.status(404).json({ error: 'Deck não encontrado' });
     }
 
-    // Gerar código único
+    // Gera código alfanumérico único
     const shareCode = Math.random().toString(36).substring(2, 8).toUpperCase();
 
     const shareData = {
@@ -40,24 +40,24 @@ export const generateShareCode = async (req, res) => {
   }
 };
 
-// Usar código de compartilhamento (copiar deck)
+// Utiliza um código de compartilhamento para copiar um deck
 export const useShareCode = async (req, res) => {
   try {
     const { shareCode } = req.body;
     const userId = req.user.userId;
 
-    // Buscar código válido
+    // Busca código válido e não expirado
     const deckShare = await deckShareModel.findActiveShareByCode(shareCode);
     if (!deckShare) {
       return res.status(404).json({ error: 'Código inválido ou expirado' });
     }
 
-    // Verificar limite de usos
+    // Verifica se não atingiu o limite de usos
     if (deckShare.maxUses && deckShare.useCount >= deckShare.maxUses) {
       return res.status(400).json({ error: 'Limite de usos atingido' });
     }
 
-    // Verificar se o usuário já tem uma cópia
+    // Previne duplicação de cópias
     const existingCopy = await deckModel.findDeckByTitle(
       `Cópia - ${deckShare.deck.title}`, 
       userId
@@ -67,7 +67,7 @@ export const useShareCode = async (req, res) => {
       return res.status(400).json({ error: 'Você já tem uma cópia deste deck' });
     }
 
-    // Criar cópia do deck
+    // Cria cópia completa do deck com todos os cards
     const copiedDeck = await deckModel.createDeck({
       title: `Cópia - ${deckShare.deck.title}`,
       description: deckShare.deck.description,
@@ -81,7 +81,7 @@ export const useShareCode = async (req, res) => {
       }
     });
 
-    // Incrementar contador de usos
+    // Registra o uso do código
     await deckShareModel.incrementUseCount(deckShare.id);
 
     res.json({ 
@@ -96,7 +96,7 @@ export const useShareCode = async (req, res) => {
   }
 };
 
-// Listar códigos gerados pelo usuário
+// Lista todos os códigos gerados pelo usuário
 export const getUserShareCodes = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -108,7 +108,7 @@ export const getUserShareCodes = async (req, res) => {
   }
 };
 
-// Revogar código
+// Revoga um código de compartilhamento (torna inativo)
 export const revokeShareCode = async (req, res) => {
   try {
     const { shareId } = req.params;
@@ -127,7 +127,7 @@ export const revokeShareCode = async (req, res) => {
   }
 };
 
-// Buscar informações do deck por código (para preview)
+// Pré-visualiza um deck antes de copiá-lo
 export const getDeckByShareCode = async (req, res) => {
   try {
     const { shareCode } = req.params;
@@ -137,6 +137,7 @@ export const getDeckByShareCode = async (req, res) => {
       return res.status(404).json({ error: 'Código inválido ou expirado' });
     }
 
+    // Retorna informações resumidas do deck
     const deckInfo = {
       id: deckShare.deck.id,
       title: deckShare.deck.title,

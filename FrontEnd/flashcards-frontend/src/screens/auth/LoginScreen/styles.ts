@@ -1,12 +1,15 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
+    // Layout principal
     container: {
         flex: 1,
         padding: 20,
         justifyContent: 'center',
         backgroundColor: '#F5F5F5',
     },
+
+    // Textos
     title: {
         fontSize: 32,
         fontWeight: 'bold',
@@ -20,6 +23,8 @@ const styles = StyleSheet.create({
         marginBottom: 40,
         color: '#666',
     },
+
+    // Campos de entrada
     input: {
         backgroundColor: '#FFF',
         borderWidth: 1,
@@ -30,6 +35,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
     },
+
+    // Botões
     button: {
         backgroundColor: '#007AFF',
         padding: 16,
@@ -45,6 +52,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+
+    // Links de navegação
     registerLink: {
         marginTop: 20,
         alignItems: 'center',
@@ -58,5 +67,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
 });
-
-export default styles;

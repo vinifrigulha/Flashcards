@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+export default StyleSheet.create({
+    // Layout principal
     container: {
         flexGrow: 1,
         padding: 20,
@@ -21,6 +22,8 @@ const styles = StyleSheet.create({
         color: '#666',
         lineHeight: 22,
     },
+
+    // Formulário
     form: {
         marginBottom: 30,
     },
@@ -52,6 +55,8 @@ const styles = StyleSheet.create({
         textAlign: 'right',
         marginTop: 4,
     },
+
+    // Botões
     buttonContainer: {
         flexDirection: 'row',
         gap: 12,
@@ -85,7 +90,8 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
-    // styles.js
+
+    // Upload de imagem
     imageSection: {
         marginTop: 10,
     },
@@ -134,15 +140,6 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    questionImageContainer: {
-        marginVertical: 10,
-        alignItems: 'center',
-    },
-    questionImage: {
-        width: '100%',
-        height: 200,
-        borderRadius: 8,
-    },
     hint: {
         fontSize: 12,
         color: '#666',
@@ -150,5 +147,3 @@ const styles = StyleSheet.create({
         fontStyle: 'italic',
     },
 });
-
-export default styles;

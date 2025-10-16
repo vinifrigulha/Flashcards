@@ -20,7 +20,7 @@ import { UseShareCodeScreen } from './src/screens/share/UseShareCodeScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-// Componente de loading simples
+// Tela de carregamento durante a verificação de autenticação
 const LoadingScreen: React.FC = () => (
   <View style={styles.center}>
     <ActivityIndicator size="large" color="#007AFF" />
@@ -28,9 +28,10 @@ const LoadingScreen: React.FC = () => (
   </View>
 );
 
-// Navegador principal
+// Define a navegação baseada no estado de autenticação
 const AppNavigator: React.FC = () => {
   const { isAuthenticated, loading } = useAuth();
+
   if (loading) {
     return <LoadingScreen />;
   }
@@ -39,6 +40,7 @@ const AppNavigator: React.FC = () => {
     <ErrorBoundary>
       <Stack.Navigator>
         {!isAuthenticated ? (
+          // Rotas públicas - usuário não autenticado
           <>
             <Stack.Screen
               name="Login"
@@ -57,6 +59,7 @@ const AppNavigator: React.FC = () => {
             />
           </>
         ) : (
+          // Rotas protegidas - usuário autenticado
           <>
             <Stack.Screen
               name="Decks"
@@ -118,7 +121,7 @@ const AppNavigator: React.FC = () => {
   );
 };
 
-// ✅ toastConfig atualizado com todos os tipos
+// Configuração personalizada para notificações Toast
 const toastConfig = {
   success: (props: any) => (
     <View style={{
@@ -184,6 +187,7 @@ const toastConfig = {
   ),
 };
 
+// Componente raiz da aplicação com provedores de contexto
 export default function App() {
   return (
     <AuthProvider>
@@ -198,6 +202,7 @@ export default function App() {
   );
 }
 
+// Estilos usados para centralizar elementos na tela e formatar o texto de carregamento
 const styles = StyleSheet.create({
   center: {
     flex: 1,

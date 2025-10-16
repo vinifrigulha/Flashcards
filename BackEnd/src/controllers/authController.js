@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { userModel } from "../models/authModel.js";
 
+// Define os critérios de segurança para senhas
 const validatePassword = (password) => {
   const errors = [];
 
@@ -23,9 +24,11 @@ const validatePassword = (password) => {
   return errors;
 };
 
+// Registro de novo usuário com validação de senha
 export const register = async (req, res) => {
   const { name, email, password } = req.body;
 
+  // Verifica se a senha atende aos requisitos de segurança
   const passwordErrors = validatePassword(password);
   if (passwordErrors.length > 0) {
     return res.status(400).json({ 
@@ -35,11 +38,13 @@ export const register = async (req, res) => {
   }
 
   try {
+    // Verifica se o email já está em uso
     const existing = await userModel.findUserByEmail(email);
     if (existing) return res.status(400).json({ error: "E-mail já cadastrado." });
 
     const user = await userModel.createUser({ name, email, password });
 
+    // Retorna dados do usuário sem informações sensíveis
     res.json({ 
       message: "Usuário criado com sucesso!", 
       user: { id: user.id, name: user.name, email: user.email } 
@@ -50,16 +55,20 @@ export const register = async (req, res) => {
   }
 };
 
+// Autenticação de usuário existente
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Busca usuário pelo email
     const user = await userModel.findUserByEmail(email);
     if (!user) return res.status(400).json({ error: "Credenciais inválidas." });
 
+    // Valida a senha fornecida
     const valid = await userModel.validatePassword(password, user.password);
     if (!valid) return res.status(400).json({ error: "Credenciais inválidas." });
 
+    // Gera token JWT para autenticação futura
     const token = jwt.sign(
       { userId: user.id },
       process.env.JWT_SECRET,
